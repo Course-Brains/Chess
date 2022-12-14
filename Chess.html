@@ -1,0 +1,515 @@
+<head>
+	<script>
+		var debug = true;
+		var board = [[["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]]]//I fully understand that this is horrible, however I am done with these memory bugs
+			whiteTurn = 1
+		if(debug == true){//dev tools
+			console.warn("debug mode/dev tools are on")
+			function override(X,Y,piece,team){//used to test the mechanics by overriding pieces on the board
+				board[X][Y].splice(0,2,piece,team)
+			}
+			function readout(X,Y){//will not be used once the graphics have been done, but untill then it will allow for testing
+				console.log(board[X][Y][0])
+				console.log(board[X][Y][1])
+			}
+		}
+		function reset() {//resets the board
+			board[0][0].splice(0,2,"r",1)
+			board[1][0].splice(0,2,"k",1)
+			board[2][0].splice(0,2,"b",1)
+			board[3][0].splice(0,2,"Q",1)
+			board[4][0].splice(0,2,"K",1)
+			board[5][0].splice(0,2,"b",1)
+			board[6][0].splice(0,2,"k",1)
+			board[7][0].splice(0,2,"r",1)
+			if(debug) {console.log("first row done")}
+			//first row^^^
+			for(let i = 0; i < 8; i++){
+				board[i][1].splice(0,2,"p",1)
+			}
+			if(debug) {console.log("white pawn row done")}
+			//second row^^^
+			for(let i = 0; i < 8; i++){
+				board[i][2].splice(0,2,"n","a")
+			}
+			for(let j = 2; j < 6; j++){
+				for(let i = 0; i < 8; i++){
+					board[i][j].splice(0,2,"n","a")
+				}
+			}
+			if(debug){console.log("empty rows complete")}
+			//empty rows^^^
+			for(let i = 0; i < 8; i++){
+				board[i][6].splice(0,2,"p",-1)
+			}
+			if(debug) {console.log("black pawn row done")}
+			//seventh row^^^
+			board[0][7].splice(0,2,"r",-1)
+			board[1][7].splice(0,2,"k",-1)
+			board[2][7].splice(0,2,"b",-1)
+			board[3][7].splice(0,2,"K",-1)
+			board[4][7].splice(0,2,"Q",-1)
+			board[5][7].splice(0,2,"b",-1)
+			board[6][7].splice(0,2,"k",-1)
+			board[7][7].splice(0,2,"r",-1)
+			if(debug) {console.log("eigth row done")}
+			//eigth row^^^
+			whiteTurn = 1
+			//resets turn
+		}
+		function move(beginX, beginY, endX, endY) { //assumes that there will be no attempted access outside of the 
+			if(board[beginX][beginY][0] == 0) {
+				alert("you can't move a non-existant piece")
+			}
+			else if(board[beginX][beginY][1]==(-1*whiteTurn)){//cheat prevention
+				alert("you can't move enemy pieces")
+			}
+			else if((endX == beginX)&&(endY == beginY)){//makes sure the start and end aren't the same
+				alert("you have to actually move the piece")
+			}
+			else if(board[endX][endY][1] == whiteTurn){//coup prevention
+				alert("You can't capture your own pieces")
+			}
+			else if(board[beginX][beginY][0]=="p") { //checks if it is a pawn
+				if(debug){console.log("pawn selected")}
+				if((endY == beginY + whiteTurn)&&(endX == beginX - 1)) {//checks if you are trying to move forward 1 and left 1
+					if(debug){console.log("attempted to attack left")}
+					if(!(board[endX][endY][1] == (-1*whiteTurn))){//checks if the end position has an enemy piece
+						board[endX][endY].splice(0,2,"p",whiteTurn)//changes the end position to a pawn
+						board[beginX][beginY].splice(0,2,"n","a")//changes the begining position to nothing
+						if(debug){console.log("attack left verified/move done")}
+						return(true)
+					}
+					else{alert("pawns can only ATTACK diagonally")}
+				}
+				else if((endY == beginY + whiteTurn)&&(endX == beginX + 1)){//same thing but to the right
+					if(debug){console.log("attempted attack right")}
+					if(!(board[endX][endY][1] == (-1*whiteTurn))){//same thing as before
+						board[endX][endY].splice(0,2,"p",whiteTurn)
+						board[beginX][beginY].splice(0,2,"n","a")
+						if(debug){"attack right verified/move done"}
+						return(true)
+					}
+					else{alert("pawns can only ATTACK diagonally")}
+				}
+				else if((endY == beginY + whiteTurn)&&(endX == beginX)){//checks if you are trying to move one forward
+					if(debug){console.log("attempted move forward")}
+					if(board[endX][endY][0] == "n"){//checks that there is nothing where you are trying to move
+						board[endX][endY].splice(0,2,"p",whiteTurn)
+						board[beginX][beginY].splice(0,2,"n","a")
+						if(debug){console.log("move verified/move done")}
+						return(true)
+					}
+					else{alert("pawns can only MOVE forward")}
+				}
+				else{alert("move the pawn like a pawn")}
+			}
+			else if(board[beginX][beginY][0] == "k"){//knight check
+				if(debug){console.log("knight selected")}
+				if((endX == beginX-2)||(endX == beginX+2)){//far left/right movement area
+					if(debug){console.log("far left/right movement area selected")}
+					if((endY == beginY+1) || (endY == beginY-1)){//1 up and 1 down are both valid
+						board[endX][endY].splice(0,2,"k",whiteTurn)
+						board[beginX][beginY].splice(0,2,"n","a")//actual movement
+						if(debug){console.log("move verified/move done")}
+						return(true)
+					}
+				}
+				if((endX == beginX-1)||(endX == beginX+1)){//near left/right movement area
+					if(debug){console.log("near left/right movement area selected")}
+					if((endY == beginY+2)||(endY == beginY-2)){//2 up/down are valid
+						board[endX][endY].splice(0,2,"k",whiteTurn)
+						board[beginX][beginY].splice(0,2,"n","a")
+						if(debug){console.log("move verified/move done")}
+						return(true)
+					}
+				}
+				else{alert("move the knight like a knight")}
+			}
+			else if(board[beginX][beginY][0] == "r"){//rook
+				if(debug){console.log("rook selected")}
+				count = 1
+				end = false
+				if(endX == beginX){//if it is moving on the x axis
+					if(debug){console.log("X axis movement selected")}
+					if(endX < beginX){//if it is moving left
+						if(debug){console.log("left movement selected")}
+						while((end==false)&&(beginX-count > endX)){//The function assumes that both the start and end position exists so we only need to go untill we encounter something or reach the destination
+							end = true
+							if(!(board[beginX-count][beginY][1]==whiteTurn)){//if the current square doesn't have a friendly piece
+								end = false
+								if(beginX-count==endX){//if the destination has been reached
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"r",whiteTurn)
+									if(debug) {}
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+					else{
+						while((end==false)&&(beginX+count > endX)){//same thing but going right
+							end = true
+							if(!(board[beginX+count][beginY][1]==whiteTurn)){
+								end = false
+								if(beginX+count==endX){
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"r",whiteTurn)
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+				}
+				else if(endY == beginY){//if it is moving on the y axis
+					if(endY < beginY){//if it is moving down
+						while((end==false)&&(beginY-count > endY)){//same thing but moving down
+							end = true
+							if(!(board[beginX][beginY-count][1]==whiteTurn)){
+								end = false
+								if(beginY-count==endY){
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"r",whiteTurn)
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+					else{
+						while((end==false)&&(beginY+count > endY)){//same thing but moving up
+							end = true
+							if(!(board[beginX][beginY+count][1]==whiteTurn)){
+								end = false
+								if(beginY+count==endY){
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"r",whiteTurn)
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+				}
+				else{alert("move a rook like a rook")}
+			}
+			else if(board[beginX][beginY][0]=="K"){//king movement
+				if((endX > beginX-2)&&(endX < beginX+2)){//checks if you are attempting to move to a valid x position, yes I understand that these can be a single if statment, but this is more readable
+					if((endY > beginY-2)&&(endY < beginY+2)){//same thing but for the y position
+						board[endX][endY].splice(0,2,"k",whiteTurn)
+						board[beginX][beginY].splice(0,2,"n","a")
+					}
+					else{alert("the king can ONLY move in a three by three area around it")}
+				}//yes there are two of them, but if I don't then it would be extra comlpicated
+				else{alert("the king can ONLY move in a three by three area around it")}
+			}
+			else if(board[beginX][beginY][0]=="b"){//bishop area(weird rook)
+				count = 1
+				end = false
+				if(debug){console.log("bishop selected")}
+				if((endX-beginX)==(endY-beginY)){
+					if(debug){console.log("step 1 move validation complete")}
+					if(endX > beginX){
+						if(debug){console.log("bishop moving right")}
+							if(endY > beginY){
+								if(debug){console.log("bishop moving up right")}
+								while((end==false)&&(beginY+count < endY)){
+									end = true
+									if(!(board[beginX+count][beginY+count][1]==whiteTurn)){
+										end = false
+										if(beginX+count==endX){
+											board[beginX][beginY].splice(0,2,"n","a")
+											board[endX][endY].splice(0,2,"b",whiteTurn)
+											if(debug){console.log("move verified/move completed")}
+											end = true
+											return(true)
+										}
+									}
+								}
+							}
+							else{
+								if(debug){console.log("bishop moving down right")}
+								while((end==false)&&(beginY-count > endY)){
+									end = true
+									if(!(board[beginX+count][beginY-count][1]==whiteTurn)){
+										end = false
+										if(beginX+count==endX){
+											board[beginX][beginY].splice(0,2,"n","a")
+											board[endX][endY].splice(0,2,"b",whiteTurn)
+											if(debug){console.log("move verified/move completed")}
+											end = true
+											return(true)
+										}
+									}
+								}
+							}
+					}
+					else{
+						if(debug){console.log("bishop moving left")}
+						if(endY > beginY){
+							if(debug){console.log("bishop moving up left")}
+							while((end==false)&&(beginY+count < endY)){
+								end = true
+								if(!(board[beginX-count][beginY+count][1]==whiteTurn)){
+									end = false
+									if(beginX-count==endX){
+										board[beginX][beginY].splice(0,2,"n","a")
+										board[endX][endY].splice(0,2,"b",whiteTurn)
+										if(debug){console.log("move verified/move completed")}
+											end = true
+										return(true)
+									}
+								}
+							}
+						}
+						else{
+							if(debug){console.log("bishop moving down left")}
+							while((end==false)&&(beginY-count > endY)){
+								end = true
+								if(!(board[beginX-count][beginY-count][1]==whiteTurn)){
+									end = false
+									if(beginX-count==endX){
+										board[beginX][beginY].splice(0,2,"n","a")
+										board[endX][endY].splice(0,2,"b",whiteTurn)
+										if(debug){console.log("move verified/move completed")}
+										end = true
+										return(true)
+									}
+								}
+							}
+						}
+					}
+				}
+				else{alert("move the bishop like a bishop")}
+			}
+			else if(board[beginX][beginY][0]=="Q"){
+				if(debug){console.log("queen selected")}
+				count = 1
+				end = false
+				if(endX == beginX){//if it is moving on the x axis
+					if(debug){console.log("X axis movement selected")}
+					if(endX < beginX){//if it is moving left
+						if(debug){console.log("left movement selected")}
+						while((end==false)&&(beginX-count > endX)){//The function assumes that both the start and end position exists so we only need to go untill we encounter something or reach the destination
+							end = true
+							if(!(board[beginX-count][beginY][1]==whiteTurn)){//if the current square doesn't have a friendly piece
+								end = false
+								if(beginX-count==endX){//if the destination has been reached
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"Q",whiteTurn)
+									if(debug) {}
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+					else{
+						while((end==false)&&(beginX+count > endX)){//same thing but going right
+							end = true
+							if(!(board[beginX+count][beginY][1]==whiteTurn)){
+								end = false
+								if(beginX+count==endX){
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"Q",whiteTurn)
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+				}
+				else if(endY == beginY){//if it is moving on the y axis
+					if(endY < beginY){//if it is moving down
+						while((end==false)&&(beginY-count > endY)){//same thing but moving down
+							end = true
+							if(!(board[beginX][beginY-count][1]==whiteTurn)){
+								end = false
+								if(beginY-count==endY){
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"Q",whiteTurn)
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+					else{
+						while((end==false)&&(beginY+count > endY)){//same thing but moving up
+							end = true
+							if(!(board[beginX][beginY+count][1]==whiteTurn)){
+								end = false
+								if(beginY+count==endY){
+									board[beginX][beginY].splice(0,2,"n","a")
+									board[endX][endY].splice(0,2,"Q",whiteTurn)
+									end = true
+									return(true)
+								}
+							}
+						}
+					}
+				}
+				if((endX-beginX)==(endY-beginY)){
+					if(debug){console.log("step 1 move validation complete")}
+					if(endX > beginX){
+						if(debug){console.log("queen moving right")}
+							if(endY > beginY){
+								if(debug){console.log("Queen moving up right")}
+								while((end==false)&&(beginY+count < endY)){
+									end = true
+									if(!(board[beginX+count][beginY+count][1]==whiteTurn)){
+										end = false
+										if(beginX+count==endX){
+											board[beginX][beginY].splice(0,2,"n","a")
+											board[endX][endY].splice(0,2,"Q",whiteTurn)
+											if(debug){console.log("move verified/move completed")}
+											end = true
+											return(true)
+										}
+									}
+								}
+							}
+							else{
+								if(debug){console.log("queen moving down right")}
+								while((end==false)&&(beginY-count > endY)){
+									end = true
+									if(!(board[beginX+count][beginY-count][1]==whiteTurn)){
+										end = false
+										if(beginX+count==endX){
+											board[beginX][beginY].splice(0,2,"n","a")
+											board[endX][endY].splice(0,2,"Q",whiteTurn)
+											if(debug){console.log("move verified/move completed")}
+											end = true
+										}
+									}
+								}
+							}
+					}
+					else{
+						if(debug){console.log("queen moving left")}
+						if(endY > beginY){
+							if(debug){console.log("queen moving up left")}
+							while((end==false)&&(beginY+count < endY)){
+								end = true
+								if(!(board[beginX-count][beginY+count][1]==whiteTurn)){
+									end = false
+									if(beginX-count==endX){
+										board[beginX][beginY].splice(0,2,"n","a")
+										board[endX][endY].splice(0,2,"Q",whiteTurn)
+										if(debug){console.log("move verified/move completed")}
+											end = true
+											return(true)
+									}
+								}
+							}
+						}
+						else{
+							if(debug){console.log("Queen moving down left")}
+							while((end==false)&&(beginY-count > endY)){
+								end = true
+								if(!(board[beginX-count][beginY-count][1]==whiteTurn)){
+									end = false
+									if(beginX-count==endX){
+										board[beginX][beginY].splice(0,2,"n","a")
+										board[endX][endY].splice(0,2,"Q",whiteTurn)
+										if(debug){console.log("move verified/move completed")}
+										end = true
+										return(true)
+									}
+								}
+							}
+						}
+					}
+				}
+			if(debug){console.log("turn swapped")}
+			}
+		return(false)
+		}
+		function draw() {
+			for(let i = 7; i >= 0; i--){
+				temp = []
+				for(let j = 0; j < 8; j++){
+					temp.push(board[i][j][0]+board[i][j][1])
+				}
+				temp.toString()
+				console.log(temp)
+			}
+		}
+		function endcheck() {
+			var whiteKing = false
+			var blackKing = false
+			if(debug){console.log("begining check for if a king is alive")}
+			for(let i = 0; i < 8; i++){
+				for(let j = 0; j < 8; j++){
+					if(board[i][j][0] == "K") {
+						if(board[i][j][1] == 1) {
+							whiteKing = true
+						}
+						if(board[i][j][1] == -1) {
+							blackKing = true
+						}					
+					}
+				}
+			}
+			if(whiteKing == false){
+				if(whiteKing == blackKing){
+					console.error("both kings are dead?")
+					alert("contrats! you broke my game!")
+				}
+				else{
+					alert("black wins!")
+					return(false)
+				}
+			}
+			else if(blackKing == false){
+				alert("white wins!")
+				start()
+				return(false)
+			}
+			else {
+				return(true)
+				if(debug){console.log("both kings are alive")}
+			}
+		}
+		function start() {//I'm realizing that if I have a bunch of debug logs then I put practically no comments because the info is right there
+			playing = true
+			reset()
+			if(debug){console.log("board reset")}
+			while(playing){
+				failed = false
+				draw()
+				if(debug){console.log("board drawn")}
+				if(whiteTurn == 1){alert("it is white's turn")}
+				else{alert("it is black's turn")}
+				if(debug){console.log("turn said")}
+				startposx = prompt("what is the x position of the piece you want to move")
+				startposy = prompt("what is the y position of the piece you want to move")
+				endposx = prompt("what is the x position of the place you want to move to")
+				endposy = prompt("what is the y position of the place you want to move to")
+				if(debug){console.log("data gained")}
+				if((startposx < 8)&&(startposx >= 0)){}
+				else if((startposy < 8)&&(startposy >= 0)){}
+				else if((endposx < 8)&&(endposx >= 0)){}
+				else if((endposy < 8)&&(endposy >= 0)){}
+				else{
+					alert("the position has to be on the board")
+					failed = true
+				}
+				if(debug){console.log("validity check done")}
+				if(failed == false){
+					if(debug){console.time(move)}
+					failed = !(move(startposx-1, startposy-1, endposx-1, endposy-1))}
+					if(debug){console.log(console.timeEnd(move))}
+					if(debug){console.log("movement done")}
+				if(failed == false) {whiteTurn *= -1}
+				if(debug){console.log("swapped turn")}
+				playing = endcheck()
+			}
+		}
+	</script>
+</head>
+<body>
+	<button type="button" onClick="start()">start</button>
+</body>
