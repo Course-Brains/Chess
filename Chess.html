@@ -74,7 +74,7 @@
 				if(debug){console.log("pawn selected")}
 				if((endY == beginY + whiteTurn)&&(endX == beginX - 1)) {//checks if you are trying to move forward 1 and left 1
 					if(debug){console.log("attempted to attack left")}
-					if(!(board[endX][endY][1] == (-1*whiteTurn))){//checks if the end position has an enemy piece
+					if(board[endX][endY][1] == (-1*whiteTurn)){//checks if the end position has an enemy piece
 						board[endX][endY].splice(0,2,"p",whiteTurn)//changes the end position to a pawn
 						board[beginX][beginY].splice(0,2,"n","a")//changes the begining position to nothing
 						if(debug){console.log("attack left verified/move done")}
@@ -84,7 +84,7 @@
 				}
 				else if((endY == beginY + whiteTurn)&&(endX == beginX + 1)){//same thing but to the right
 					if(debug){console.log("attempted attack right")}
-					if(!(board[endX][endY][1] == (-1*whiteTurn))){//same thing as before
+					if(board[endX][endY][1] == (-1*whiteTurn)){//same thing as before
 						board[endX][endY].splice(0,2,"p",whiteTurn)
 						board[beginX][beginY].splice(0,2,"n","a")
 						if(debug){"attack right verified/move done"}
@@ -428,7 +428,7 @@
 		return(false)
 		}
 		function draw() {
-			for(let i = 7; i >= 0; i--){
+			for(let i = 0; i < 8; i++){
 				temp = []
 				for(let j = 0; j < 8; j++){
 					temp.push(board[i][j][0]+board[i][j][1])
