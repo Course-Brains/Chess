@@ -423,7 +423,6 @@
 						}
 					}
 				}
-			if(debug){console.log("turn swapped")}
 			}
 		return(false)
 		}
@@ -473,6 +472,22 @@
 				if(debug){console.log("both kings are alive")}
 			}
 		}
+		function promotion(){
+			if(debug){console.log("promotion check begin")}
+			if(whiteTurn == 1){
+				var row = 7
+			}
+			else{
+				var row = 0
+			}
+			if(debug){console.log("row selected")}
+			for(let i = 0; i < 8; i++){
+				if(board[i][row][0] == "p"){
+					if(debug){console.log("pawn found")}
+					board[row][i].splice(0,2,(prompt("What would you like the promoted pawn to be?")),whiteTurn)
+				}
+			}
+		}
 		function start() {//I'm realizing that if I have a bunch of debug logs then I put practically no comments because the info is right there
 			playing = true
 			reset()
@@ -503,7 +518,11 @@
 					failed = !(move(startposx-1, startposy-1, endposx-1, endposy-1))}
 					if(debug){console.log(console.timeEnd(move))}
 					if(debug){console.log("movement done")}
-				if(failed == false) {whiteTurn *= -1}
+				if(failed == false) {
+					promotion()
+					whiteTurn *= -1
+					if(debug){console.log("turn swapped")}
+				}
 				if(debug){console.log("swapped turn")}
 				playing = endcheck()
 			}
