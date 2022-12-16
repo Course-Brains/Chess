@@ -102,6 +102,24 @@
 					}
 					else{alert("pawns can only MOVE forward")}
 				}
+				else if((endY == beginY + (2*whiteTurn))&&(endX == beginX)){
+					if(debug){console.log("attempting move two forward")}
+					if((board[beginX][beginY+whiteTurn][0]=="n")&&(board[beginX][beginY+(2*whiteTurn)][0]=="n")){
+						if(debug){console.log("double move first step validated")}
+						if((whiteTurn == 1)&&(beginY==1)){
+							if(debug){console.log("double move second step validated")}
+							board[beginX][beginY].splice(0,2,"n","a")
+							board[endX][endY].splice(0,2,"p",whiteTurn)
+							return(true)
+						}
+						else if((whiteTurn == -1)&&(beginY==6)){
+							if(debug){console.log("double move second step validated")}
+							board[beginX][beginY].splice(0,2,"n","a")
+							board[endX][endY].splice(0,2,"p",whiteTurn)
+							return(true)
+						}
+					}
+				}
 				else{alert("move the pawn like a pawn")}
 			}
 			else if(board[beginX][beginY][0] == "k"){//knight check
