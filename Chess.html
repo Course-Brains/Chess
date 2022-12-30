@@ -57,6 +57,32 @@
 			whiteTurn = 1
 			//resets turn
 		}
+		function RBQ(beginX, beginY, endX, endY, X, Y, piece){
+			end = false
+			count = 1
+			while((end==false)){
+				end = true
+				if(debug){console.log("count = " + (count))}
+				if(debug){console.log("end true")}
+				if(board[beginX+(X*count)][beginY+(Y*count)][1] == "a"){
+					if(debug){console.log("Current square is not on same team/end false")}
+					end = false
+					if((beginY+(Y*count)==endY)||(beginX+(X*count)==endX)){
+						if(debug){console.log("End reached/completing move")}
+						board[beginX][beginY].splice(0,2,"n","a");
+						board[endX][endY].splice(0,2,piece,whiteTurn);
+						end = true
+						if(debug){console.log("move done")}
+						return(true)
+					}
+				}
+				if(board[beginX+(X*count)][beginY+(Y*count)][1] == (-1*whiteTurn)){
+					end = true
+					if(debug){console.log("You can't move through enemy pieces")}
+				}
+			count += 1
+			}
+		}
 		function move(beginX, beginY, endX, endY) { //assumes that there will be no attempted access outside of the 
 			if(board[beginX][beginY][0] == "n") {
 				alert("you can't move a non-existant piece")
@@ -146,111 +172,25 @@
 			}
 			else if(board[beginX][beginY][0] == "r"){//rook
 				if(debug){console.log("rook selected")}
-				count = 1
-				end = false
 				if(endX == beginX){//if it is moving on the x axis
 					if(debug){console.log("X axis movement selected")}
 					if(endX < beginX){//if it is moving left
 						if(debug){console.log("left movement selected")}
-						while((end==false)){//rook going left
-							end = true
-							if(debug){console.log("Current square is " + (beginY-count))}
-							if(debug){console.log("end true")}
-							if(board[beginX][beginY-count][1] == "a"){
-								if(debug){console.log("Current square is not on same team/end false")}
-								end = false
-								if(beginY-count==endY){
-									if(debug){console.log("End reached/completing move")}
-									board[beginX][beginY].splice(0,2,"n","a");
-									board[endX][endY].splice(0,2,"r",whiteTurn);
-									end = true
-									if(debug){console.log("move done")}
-									return(true)
-								}
-							}
-							if(board[beginX][beginY-count][1] == (-1*whiteTurn)){
-								end = true
-								if(debug){console.log("You can't move through enemy pieces")}
-							}
-						count += 1
-						}
+						if(RBQ(beginX,beginY,endX,endY,0,1,"r")){return(true)}
 					}
 					else{
 						if(debug){console.log("moving right")}
-						while((end==false)){//same thing but going right
-							end = true
-							if(debug){console.log("Current square is " + (beginY+count))}
-							if(debug){console.log("end true")}
-							if(board[beginX][beginY+count][1] == "a"){
-								if(debug){console.log("Current square is not on same team/end false")}
-								end = false
-								if(beginY+count==endY){
-									if(debug){console.log("End reached/completing move")}
-									board[beginX][beginY].splice(0,2,"n","a");
-									board[endX][endY].splice(0,2,"r",whiteTurn);
-									end = true
-									if(debug){console.log("move done")}
-									return(true)
-								}
-							}
-							if(board[beginX][beginY+count][1] == (-1*whiteTurn)){
-								end = true
-								if(debug){console.log("You can't move through enemy pieces")}
-							}
-						count += 1
-						}
+						if(RBQ(beginX,beginY,endX,endY,0,-1,"r")){return(true)}
 					}
 				}
 				else if(endY == beginY){//if it is moving on the y axis
 					if(beginX < endX){//if it is moving down
 						if(debug){console.log("moving down")}
-						while((end==false)){
-							end = true
-							if(debug){console.log("Current square is " + (beginX+count))}
-							if(debug){console.log("end true")}
-							if(board[beginX+count][beginY][1] == "a"){
-								if(debug){console.log("Current square is not on same team/end false")}
-								end = false
-								if(beginX+count==endX){
-									if(debug){console.log("End reached/completing move")}
-									board[beginX][beginY].splice(0,2,"n","a");
-									board[endX][endY].splice(0,2,"r",whiteTurn);
-									end = true
-									if(debug){console.log("move done")}
-									return(true)
-								}
-							}
-							if(board[beginX+count][beginY][1] == (-1*whiteTurn)){
-								end = true
-								if(debug){console.log("You can't move through enemy pieces")}
-							}
-						count += 1
-						}
+						if(RBQ(beginX,beginY,endX,endY,1,0,"r")){return(true)}
 					}
 					else{
 						if(debug){console.log("moving up")}
-						while((end==false)){
-							end = true
-							if(debug){console.log("Current square is " + (beginX-count))}
-							if(debug){console.log("end true")}
-							if(board[beginX-count][beginY][1] == "a"){
-								if(debug){console.log("Current square is not on same team/end false")}
-								end = false
-								if(beginX-count==endX){
-									if(debug){console.log("End reached/completing move")}
-									board[beginX][beginY].splice(0,2,"n","a");
-									board[endX][endY].splice(0,2,"r",whiteTurn);
-									end = true
-									if(debug){console.log("move done")}
-									return(true)
-								}
-							}
-							if(board[beginX-count][beginY][1] == (-1*whiteTurn)){
-								end = true
-								if(debug){console.log("You can't move through enemy pieces")}
-							}
-						count += 1
-						}
+						if(RBQ(beginX,beginY,endX,endY,-1,0,"r")){return(true)}
 					}
 				}
 				else{alert("move a rook like a rook")}
@@ -265,17 +205,85 @@
 				}//yes there are two of them, but if I don't then it would be extra comlpicated
 				else{alert("the king can ONLY move in a three by three area around it")}
 			}
-			else if(board[beginX][beginY][0]=="b"){//bishop area(weird rook)
-				count = 1
-				end = false
+			else if(board[beginX][beginY][0]=="b"){//bishop area
 				if(debug){console.log("bishop selected")}
-				//HERE
+				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
+					if(debug){console.log("step 1 valid")}
+					if(endY > beginY){
+						if(debug){console.log("moving right")}
+						if(endX > beginX){
+							if(debug){console.log("moving down")}
+							if(RBQ(beginX,beginY,endX,endY,1,1,"b")){return(true)}
+						}
+						else{
+							if(debug){console.log("moving up")}
+							if(RBQ(beginX,beginY,endX,endY,-1,1,"b")){return(true)}
+						}
+					}
+					else{
+						if(debug){console.log("moving left")}
+						if(endX > beginX){
+							if(debug){console.log("moving down")}
+							if(RBQ(beginX,beginY,endX,endY,1,-1,"b")){return(true)}
+						}
+						else{
+							if(debug){console.log("moving up")}
+							if(RBQ(beginX,beginY,endX,endY,-1,-1,"b")){return(true)}
+						}
+					}
+				}
 			}
 			else if(board[beginX][beginY][0]=="Q"){
 				if(debug){console.log("queen selected")}
-				count = 1
-				end = false
-				//HERE TOO
+				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
+					if(debug){console.log("step 1 valid")}
+					if(endY > beginY){
+						if(debug){console.log("moving right")}
+						if(endX > beginX){
+							if(debug){console.log("moving down")}
+							if(RBQ(beginX,beginY,endX,endY,1,1,"Q")){return(true)}
+						}
+						else{
+							if(debug){console.log("moving up")}
+							if(RBQ(beginX,beginY,endX,endY,-1,1,"Q")){return(true)}
+						}
+					}
+					else{
+						if(debug){console.log("moving left")}
+						if(endX > beginX){
+							if(debug){console.log("moving down")}
+							if(RBQ(beginX,beginY,endX,endY,1,-1,"Q")){return(true)}
+						}
+						else{
+							if(debug){console.log("moving up")}
+							if(RBQ(beginX,beginY,endX,endY,-1,-1,"Q")){return(true)}
+						}
+					}
+				}
+				else if((beginX == endX)||(beginY == endY)){
+					if(endX == beginX){//if it is moving on the x axis
+						if(debug){console.log("X axis movement selected")}
+						if(endX < beginX){//if it is moving left
+							if(debug){console.log("left movement selected")}
+							if(RBQ(beginX,beginY,endX,endY,0,1,"Q")){return(true)}
+						}
+							else{
+							if(debug){console.log("moving right")}
+							if(RBQ(beginX,beginY,endX,endY,0,-1,"Q")){return(true)}
+						}
+					}
+					else if(endY == beginY){//if it is moving on the y axis
+						if(beginX < endX){//if it is moving down
+							if(debug){console.log("moving down")}
+							if(RBQ(beginX,beginY,endX,endY,1,0,"Q")){return(true)}
+						}
+					else{
+							if(debug){console.log("moving up")}
+							if(RBQ(beginX,beginY,endX,endY,-1,0,"Q")){return(true)}
+						}
+					}
+				}
+				else{alert("move the queen like a queen")}
 			}
 		return(false)
 		}
