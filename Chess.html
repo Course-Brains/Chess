@@ -369,6 +369,10 @@
 				else if((startposy < 8)&&(startposy >= 0)){}
 				else if((endposx < 8)&&(endposx >= 0)){}
 				else if((endposy < 8)&&(endposy >= 0)){}
+				else if(startposx == "quit"){
+					alert("Quitting")
+					return(false)
+				}
 				else{
 					alert("the position has to be on the board")
 					failed = true
