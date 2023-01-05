@@ -315,15 +315,17 @@
 			}
 			if(whiteKing == false){
 				if(whiteKing == blackKing){
-					console.error("both kings are dead?")
+					console.error("both kings are dead")
 					alert("contrats! you broke my game!")
 				}
 				else{
+					if(debug){console.log("black victory")}
 					alert("black wins!")
 					return(false)
 				}
 			}
 			else if(blackKing == false){
+				if(debug){console.log("white victory")}
 				alert("white wins!")
 				start()
 				return(false)
@@ -360,18 +362,19 @@
 				if(whiteTurn == 1){alert("it is white's turn")}
 				else{alert("it is black's turn")}
 				if(debug){console.log("turn said")}
-				startposx = prompt("what is the x position of the piece you want to move")
-				startposy = prompt("what is the y position of the piece you want to move")
-				endposx = prompt("what is the x position of the place you want to move to")
-				endposy = prompt("what is the y position of the place you want to move to")
+				inputs = []
+				inputs.push(prompt("what is the x position of the piece you want to move"))
+				inputs.push(prompt("what is the y position of the piece you want to move"))
+				inputs.push(prompt("what is the x position of the place you want to move to"))
+				inputs.push(prompt("what is the y position of the place you want to move to"))
 				if(debug){console.log("data gained")}
-				if((startposx < 8)&&(startposx >= 0)){}
-				else if((startposy < 8)&&(startposy >= 0)){}
-				else if((endposx < 8)&&(endposx >= 0)){}
-				else if((endposy < 8)&&(endposy >= 0)){}
-				else{
-					alert("the position has to be on the board")
-					failed = true
+				for(i in inputs) {
+					if((i < 9)&&(i > 0)){}
+					else{
+						failed = true
+						if(debug){console.log("invalid input(out of bounds)")}
+						alert("It has to be on the board")
+					}
 				}
 				if(debug){console.log("validity check done")}
 				if(failed == false){
@@ -388,8 +391,6 @@
 			}
 		}
 	</script>
-	<style>
-	</style>
 </head>
 <body>
 	<button type="button" onClick="start()">start</button>
