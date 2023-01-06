@@ -369,8 +369,7 @@
 				inputs.push(prompt("what is the y position of the place you want to move to"))
 				if(debug){console.log("data gained")}
 				for(i in inputs) {
-					if((i < 9)&&(i > 0)){}
-					else{
+					if(!((i < 9)&&(i > 0))){
 						failed = true
 						if(debug){console.log("invalid input(out of bounds)")}
 						alert("It has to be on the board")
