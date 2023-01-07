@@ -14,23 +14,23 @@
 			}
 		}
 		function reset() {//resets the board
-			board[0][0].splice(0,2,"r",1)
-			board[1][0].splice(0,2,"k",1)
-			board[2][0].splice(0,2,"b",1)
-			board[3][0].splice(0,2,"Q",1)
-			board[4][0].splice(0,2,"K",1)
-			board[5][0].splice(0,2,"b",1)
-			board[6][0].splice(0,2,"k",1)
-			board[7][0].splice(0,2,"r",1)
-			if(debug) {console.log("first row done")}
-			//first row^^^
-			for(let i = 0; i < 8; i++){
-				board[i][1].splice(0,2,"p",1)
-			}
-			if(debug) {console.log("white pawn row done")}
-			//second row^^^
-			for(let i = 0; i < 8; i++){
-				board[i][2].splice(0,2,"n","a")
+			for(let i = -1; i < 2; i += 2){
+				if(debug){console.log("drawing for team " + i)}
+				board[0][((i-1)/-2)*7].splice(0,2,"r",i)
+				board[1][((i-1)/-2)*7].splice(0,2,"k",i)
+				board[2][((i-1)/-2)*7].splice(0,2,"b",i)
+				board[3][((i-1)/-2)*7].splice(0,2,"Q",i)
+				board[4][((i-1)/-2)*7].splice(0,2,"K",i)
+				board[5][((i-1)/-2)*7].splice(0,2,"b",i)
+				board[6][((i-1)/-2)*7].splice(0,2,"k",i)
+				board[7][((i-1)/-2)*7].splice(0,2,"r",i)
+				if(debug){console.log("rear row for team " + i + " done")}
+				//rear rows^^^
+					for(let x = 0; x < 8; x++){
+						board[x][(((i*-1)+1)*2.5)+1].splice(0,2,"p",i)
+					}//1/6-1 0/5/2.5 0/2-1 -1/1*-1 1/-1
+				if(debug){console.log("pawns for team " + i + " done")}
+				//pawn rows^^^
 			}
 			for(let j = 2; j < 6; j++){
 				for(let i = 0; i < 8; i++){
@@ -38,23 +38,8 @@
 				}
 			}
 			if(debug){console.log("empty rows complete")}
-			//empty rows^^^
-			for(let i = 0; i < 8; i++){
-				board[i][6].splice(0,2,"p",-1)
-			}
-			if(debug) {console.log("black pawn row done")}
-			//seventh row^^^
-			board[0][7].splice(0,2,"r",-1)
-			board[1][7].splice(0,2,"k",-1)
-			board[2][7].splice(0,2,"b",-1)
-			board[3][7].splice(0,2,"K",-1)
-			board[4][7].splice(0,2,"Q",-1)
-			board[5][7].splice(0,2,"b",-1)
-			board[6][7].splice(0,2,"k",-1)
-			board[7][7].splice(0,2,"r",-1)
-			if(debug) {console.log("eigth row done")}
-			//eigth row^^^
 			whiteTurn = 1
+			if(debug){console.log("turn reset")}
 			//resets turn
 		}
 		function RBQ(beginX, beginY, endX, endY, X, Y, piece){
