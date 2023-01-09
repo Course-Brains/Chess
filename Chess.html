@@ -3,17 +3,15 @@
 		var debug = true;
 		var board = [[["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]]]//I fully understand that this is horrible, however I am done with these memory bugs
 			whiteTurn = 1
-		if(debug == true){//dev tools
+		if(debug){
 			console.warn("debug mode/dev tools are on")
 			function override(X,Y,piece,team){//used to test the mechanics by overriding pieces on the board
 				board[X][Y].splice(0,2,piece,team)
-			}
-			function readout(X,Y){//will not be used once the graphics have been done, but untill then it will allow for testing
-				console.log(board[X][Y][0])
-				console.log(board[X][Y][1])
+				if(debug){console.log("piece at (" + X + "," + Y + ") changed")}
 			}
 		}
-		function reset() {//resets the board
+		function reset() {
+			console.log("resetting")
 			for(let i = -1; i < 2; i += 2){
 				if(debug){console.log("drawing for team " + i)}
 				board[0][((i-1)/-2)*7].splice(0,2,"r",i)
@@ -28,7 +26,7 @@
 				//rear rows^^^
 					for(let x = 0; x < 8; x++){
 						board[x][(((i*-1)+1)*2.5)+1].splice(0,2,"p",i)
-					}//1/6-1 0/5/2.5 0/2-1 -1/1*-1 1/-1
+					}
 				if(debug){console.log("pawns for team " + i + " done")}
 				//pawn rows^^^
 			}
@@ -45,7 +43,7 @@
 		function RBQ(beginX, beginY, endX, endY, X, Y, piece){
 			end = false
 			count = 1
-			while((end==false)){
+			while(end==false){
 				end = true
 				if(debug){console.log("count = " + (count))}
 				if(debug){console.log("end true")}
@@ -81,6 +79,7 @@
 			else if(board[endX][endY][1] == whiteTurn){//coup prevention
 				alert("You can't capture your own pieces")
 			}
+			//Simple checks^^^ww
 			else if(board[beginX][beginY][0]=="p") { //checks if it is a pawn
 				if(debug){console.log("pawn selected")}
 				if((endY == beginY + whiteTurn)&&(endX == beginX - 1)) {//checks if you are trying to move forward 1 and left 1
@@ -339,6 +338,7 @@
 		function start() {//I'm realizing that if I have a bunch of debug logs then I put practically no comments because the info is right there
 			playing = true
 			reset()
+			quit = false
 			if(debug){console.log("board reset")}
 			while(playing){
 				failed = false
@@ -356,7 +356,13 @@
 				for(i in inputs) {
 					if(debug){console.log("Checking input " + (i+1))}
 					if(debug){console.log("input is " + inputs[i])}
-					if(!((inputs[i] < 9)&&(inputs[i] > 0))){
+					if(inputs[i] == undefined) {
+						quit = true
+						failed = true
+						playing = false
+						if(debug){console.log("quitting game")}
+					}
+					else if(!((inputs[i] < 9)&&(inputs[i] > 0))){
 						failed = true
 						if(debug){console.log("invalid input(out of bounds)")}
 						alert("It has to be on the board")
@@ -373,7 +379,9 @@
 					whiteTurn *= -1
 					if(debug){console.log("turn swapped")}
 				}
-				playing = endcheck()
+				if(!(quit)){
+					playing = endcheck()
+				}
 			}
 		}
 	</script>
