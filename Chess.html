@@ -1,11 +1,11 @@
 <head>
 	<script>
 		var debug = true;
-		var board = [[["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]]]//I fully understand that this is horrible, however I am done with these memory bugs
+		var board = [[["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]]]
 			whiteTurn = 1
 		if(debug){
 			console.warn("debug mode/dev tools are on")
-			function override(X,Y,piece,team){//used to test the mechanics by overriding pieces on the board
+			function override(X,Y,piece,team){//I feel like the name of the function and it's inputs explain it
 				board[X][Y].splice(0,2,piece,team)
 				if(debug){console.log("piece at (" + X + "," + Y + ") changed")}
 			}
@@ -37,7 +37,7 @@
 			}
 			if(debug){console.log("empty rows complete")}
 			whiteTurn = 1
-			if(debug){console.log("turn reset")}
+			if(debug){console.log("turn reset/reset done")}
 			//resets turn
 		}
 		function RBQ(beginX, beginY, endX, endY, X, Y, piece){
@@ -180,7 +180,7 @@
 				else{alert("move a rook like a rook")}
 			}
 			else if(board[beginX][beginY][0]=="K"){//king movement
-				if((endX > beginX-2)&&(endX < beginX+2)){//checks if you are attempting to move to a valid x position, yes I understand that these can be a single if statment, but this is more readable
+				if((endX > beginX-2)&&(endX < beginX+2)){//checks if you are attempting to move to a valid x position
 					if((endY > beginY-2)&&(endY < beginY+2)){//same thing but for the y position
 						board[endX][endY].splice(0,2,"k",whiteTurn)
 						board[beginX][beginY].splice(0,2,"n","a")
@@ -272,6 +272,7 @@
 		return(false)
 		}
 		function draw() {
+			if(debug){console.log("starting draw")}
 			for(let i = 0; i < 8; i++){
 				temp = []
 				for(let j = 0; j < 8; j++){
@@ -280,6 +281,7 @@
 				temp.toString()
 				console.log(temp)
 			}
+			if(debug){console.log("draw done")}
 		}
 		function endcheck() {
 			var whiteKing = false
@@ -335,15 +337,13 @@
 				}
 			}
 		}
-		function start() {//I'm realizing that if I have a bunch of debug logs then I put practically no comments because the info is right there
+		function start() {
 			playing = true
 			reset()
 			quit = false
-			if(debug){console.log("board reset")}
 			while(playing){
 				failed = false
 				draw()
-				if(debug){console.log("board drawn")}
 				if(whiteTurn == 1){alert("it is white's turn")}
 				else{alert("it is black's turn")}
 				if(debug){console.log("turn said")}
@@ -366,8 +366,8 @@
 							failed = true
 							if(debug){console.log("invalid input(out of bounds)")}
 							alert("It has to be on the board")
+						}
 					}
-				}
 				}
 				if(debug){console.log("validity check done")}
 				if(failed == false){
