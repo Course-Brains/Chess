@@ -79,7 +79,7 @@
 			else if(board[endX][endY][1] == whiteTurn){//coup prevention
 				alert("You can't capture your own pieces")
 			}
-			//Simple checks^^^ww
+			//Simple checks^^^
 			else if(board[beginX][beginY][0]=="p") { //checks if it is a pawn
 				if(debug){console.log("pawn selected")}
 				if((endY == beginY + whiteTurn)&&(endX == beginX - 1)) {//checks if you are trying to move forward 1 and left 1
@@ -323,17 +323,21 @@
 		}
 		function promotion(){
 			if(debug){console.log("promotion check begin")}
-			if(whiteTurn == 1){
-				var row = 7
-			}
-			else{
-				var row = 0
-			}
-			if(debug){console.log("row selected")}
+			var row = ((whiteTurn+1)*3.5)
+			var valid = ["k","r","b","Q"]
+			if(debug){console.log("row: " + row)}
 			for(let i = 0; i < 8; i++){
+				if(debug){console.log("checking column " + i)}
 				if(board[i][row][0] == "p"){
 					if(debug){console.log("pawn found")}
-					board[row][i].splice(0,2,(prompt("What would you like the promoted pawn to be?")),whiteTurn)
+					do {
+						if(debug){console.log("attempting input")}
+						var input = prompt("What would you like the promoted pawn to be?")
+					}
+					while(!(valid.includes(input)))
+					if(debug){console.log("input valid")}
+					board[i][row].splice(0,2,input,whiteTurn)
+					if(debug){console.log("Promotion done")}
 				}
 			}
 		}
