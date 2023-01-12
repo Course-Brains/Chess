@@ -357,21 +357,25 @@
 				inputs.push(prompt("what is the x position of the place you want to move to"))
 				inputs.push(prompt("what is the y position of the place you want to move to"))
 				if(debug){console.log("data gained")}
-				for(i in inputs) {
-					if(!(failed)){
-						if(debug){console.log("Checking input " + (i))}
-						if(debug){console.log("input is " + inputs[i])}
-						if(inputs[i] == undefined) {
-							failed = true
-							playing = false
-							if(debug){console.log("quitting game")}
-						}
-						else if(!((inputs[i] < 9)&&(inputs[i] > 0))){
-							failed = true
-							if(debug){console.log("invalid input(out of bounds)")}
-							alert("It has to be on the board")
-						}
+				i = 0
+				while((i < (inputs.length-1))&&(!(failed))){
+					if(debug){console.log("Checking input " + (i))}
+					if(debug){console.log("input is " + inputs[i])}
+					if(inputs[i] == undefined) {
+						failed = true
+						playing = false
+						if(debug){console.log("quitting game")}
 					}
+					else if(inputs[i] == ""){
+						if(debug){console.log("nothing was entered")}
+						alert("Please enter a location")
+					}
+					else if(!((inputs[i] < 9)&&(inputs[i] > 0))){
+						failed = true
+						if(debug){console.log("invalid input(out of bounds)")}
+						alert("It has to be on the board")
+					}
+					i ++
 				}
 				if(debug){console.log("validity check done")}
 				if(failed == false){
@@ -381,7 +385,7 @@
 						console.log(console.timeEnd("turn"))
 						console.log("movement done")
 					}
-				if(failed == false) {
+				if(failed == false) {//the reason why it check twice is because the first one redefines false
 					promotion()
 					whiteTurn *= -1
 					if(debug){console.log("turn swapped")}
