@@ -58,6 +58,7 @@
 						board[endX][endY].splice(0,2,piece,whiteTurn);
 						end = true
 						if(debug){console.log("move done")}
+						moved[(((beginX/7)*2)+((whiteTurn+1)*1.5))] = true
 						return(true)
 					}
 				}
