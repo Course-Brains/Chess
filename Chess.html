@@ -1,7 +1,14 @@
 <head>
 	<script>
 		var debug = true;
-		var board = [[["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]]]
+		board = []
+		for(let i = 0; i < 9; i++){
+			temp = []
+			for(let j = 0; j < 9; j++){
+				temp.push(["n","a"])
+			}
+			board.push(temp)
+		}
 			whiteTurn = 1
 		var moved = [false,false,false,false,false,false]//this is for castling, it tracks if a piece has moved yet, the first three are for white with 1: left rook 2: king 3: right rook, then the other ones are the same but for black
 		if(debug){
