@@ -3,9 +3,10 @@
 		var debug = true;
 		var board = [[["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]], [["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"], ["n","a"]]]
 			whiteTurn = 1
+		var moved = [false,false,false,false,false,false]//this is for castleing, it tracks if a piece has moved yet, the first three are for white with 1: left rook 2: king 3: right rook, then the other ones are the same but for black
 		if(debug){
 			console.warn("debug mode/dev tools are on")
-			function override(X,Y,piece,team){//I feel like the name of the function and it's inputs explain it
+			function override(X,Y,piece,team){
 				board[X][Y].splice(0,2,piece,team)
 				if(debug){console.log("piece at (" + X + "," + Y + ") changed")}
 			}
@@ -66,7 +67,7 @@
 			count += 1
 			}
 		}
-		function move(beginX, beginY, endX, endY) { //assumes that there will be no attempted access outside of the 
+		function move(beginX, beginY, endX, endY) {
 			if(board[beginX][beginY][0] == "n") {
 				alert("you can't move a non-existant piece")
 			}
@@ -77,10 +78,47 @@
 				alert("you have to actually move the piece")
 			}
 			else if(board[endX][endY][1] == whiteTurn){//coup prevention
-				alert("You can't capture your own pieces")
+				if(board[beginX][beginY][0] == "r"){
+					if(board[endX][endY][0] == "K"){
+						if(debug){console.log("attempted castle")}
+						if((beginX == 0)||(beginX == 7)){
+							if(debug){console.log("back row")}
+							if((beginY == 0)||(beginY == 7)){
+								if(debug){console.log("top/bottom")}			
+								var valid = true
+								if(debug){console.log("starting empty check")}
+								if(beginY == 0){
+									var count = 1
+									if(debug){console.log("left side")}
+									while((count < 4)&&(valid)){
+										if(debug){console.log("checking " + count)}
+										if(board[beginX][count][1] == whiteTurn){valid = false}
+										if(debug){console.log(valid)}
+										count++
+									}
+								}
+								else{
+									var count = 6
+									if(debug){console.log("right side")}
+									while((count > 4)&&(valid)){
+										if(debug){console.log("checking " + count)}
+										if(board[beginX][count][1] == whiteTurn){valid = false}
+										if(debug){console.log(valid)}
+										count--
+									}
+								}
+								if(valid){
+									console.log("it worked")
+									//instert actual movement, I don't know how castleing moves
+								}
+							}
+						}
+					}
+				}
+				else{alert("You can't capture your own pieces")}
 			}
 			//Simple checks^^^
-			else if(board[beginX][beginY][0]=="p") { //checks if it is a pawn
+			else if(board[beginX][beginY][0]=="p") { //pawn
 				if(debug){console.log("pawn selected")}
 				if((endY == beginY + whiteTurn)&&(endX == beginX - 1)) {//checks if you are trying to move forward 1 and left 1
 					if(debug){console.log("attempted to attack left")}
@@ -132,7 +170,7 @@
 				}
 				else{alert("move the pawn like a pawn")}
 			}
-			else if(board[beginX][beginY][0] == "k"){//knight check
+			else if(board[beginX][beginY][0] == "k"){//knight
 				if(debug){console.log("knight selected")}
 				if((endX == beginX-2)||(endX == beginX+2)){//far left/right movement area
 					if(debug){console.log("far left/right movement area selected")}
@@ -179,7 +217,7 @@
 				}
 				else{alert("move a rook like a rook")}
 			}
-			else if(board[beginX][beginY][0]=="K"){//king movement
+			else if(board[beginX][beginY][0]=="K"){//king
 				if((endX > beginX-2)&&(endX < beginX+2)){//checks if you are attempting to move to a valid x position
 					if((endY > beginY-2)&&(endY < beginY+2)){//same thing but for the y position
 						board[endX][endY].splice(0,2,"k",whiteTurn)
@@ -189,7 +227,7 @@
 				}//yes there are two of them, but if I don't then it would be extra comlpicated
 				else{alert("the king can ONLY move in a three by three area around it")}
 			}
-			else if(board[beginX][beginY][0]=="b"){//bishop area
+			else if(board[beginX][beginY][0]=="b"){//bishop
 				if(debug){console.log("bishop selected")}
 				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
 					if(debug){console.log("step 1 valid")}
@@ -217,7 +255,7 @@
 					}
 				}
 			}
-			else if(board[beginX][beginY][0]=="Q"){
+			else if(board[beginX][beginY][0]=="Q"){//queen
 				if(debug){console.log("queen selected")}
 				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
 					if(debug){console.log("step 1 valid")}
