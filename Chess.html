@@ -122,6 +122,7 @@
 									if(debug){console.log("pieces cleared")}
 									board[Math.abs((beginX)-1)][beginY].splice(0,2,"K",whiteTurn)
 									board[Math.abs((beginX)-2)][beginY].splice(0,2,"r",whiteTurn)
+									return(true)
 								}
 							}
 						}
@@ -448,5 +449,4 @@
 	</script>
 </head>
 <body>
-	<button type="button" onClick="start()">start</button>
 </body>
