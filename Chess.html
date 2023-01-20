@@ -358,13 +358,14 @@
 				else{
 					if(debug){console.log("black victory")}
 					alert("black wins!")
+					reset()
 					return(false)
 				}
 			}
 			else if(blackKing == false){
 				if(debug){console.log("white victory")}
 				alert("white wins!")
-				start()
+				reset()
 				return(false)
 			}
 			else {
@@ -447,7 +448,143 @@
 				}
 			}
 		}
+		function graphicStart(X,Y,x,y) {
+			move(X,Y,x,y)
+			whiteTurn = 1
+			failed = false
+			graphicDraw()
+			if(whiteTurn == 1){alert("it's white's turn")}
+			else if(whiteTurn == -1){alert("it's black's turn")}
+			else{
+				console.error("it is neither turn")
+				alert("Turn error")
+			}
+			//failed = (!(move(X,Y,x,y)))
+			if(debug){console.log("movement done")}
+			if(!(failed)){
+				promotion()
+				whiteTurn *= -1
+				endcheck()
+			}
+		}
 	</script>
 </head>
 <body>
+	<div id="test" class="grid-container"></div>
+	<style>
+		.grid-container {
+			display:grid;
+			grid-template-columns:auto auto auto auto auto auto auto auto;
+			justify-content:center;
+		}
+	</style>
+	<script>
+		var clickPos = [0,0]
+		var firstClick = true
+		if(window.innerWidth < window.innerHeight){
+			size = window.innerWidth-15
+		}
+		else{
+			size = window.innerHeight-15
+		}
+		for(let i = 7; i > -1; i--){
+			for(let j = 0; j < 8; j++){
+				var buttonShort = document.createElement("button");
+				var test = document.getElementById("test");
+				buttonShort.className = "grid-item"
+				buttonShort.setAttribute("id", ("" + j) + i)
+				if(debug){console.log(buttonShort.id)}
+				buttonShort.style.width = ((size/8)+"px")
+				buttonShort.style.height = ((size/8)+"px")
+				buttonShort.dataset.x = j
+				buttonShort.dataset.y = i
+				buttonShort.style.fontSize = size/10
+				buttonShort.innerHTML = (("" + j) + i)
+				test.appendChild(buttonShort);
+				if(debug){console.log("button made at " + j + i)}
+				buttonShort.addEventListener("click", function() {
+					if(debug){
+						if(debug){console.log("previous click was at " + clickPos[0] + clickPos[1])}
+						if(debug){console.log("current click is at " + (this.dataset.x) + (this.dataset.y))}
+						if(debug){console.log(firstClick)}
+					}
+					if(firstClick){
+						clickPos[0] = (this.dataset.x)
+						clickPos[1] = (this.dataset.y)
+						firstClick = false
+					}
+					else{
+						firstClick = true
+						graphicStart(clickPos[0],clickPos[1],(this.dataset.x),(this.dataset.y))
+					}
+				})
+			}
+		}
+		//9812 white king
+		//9813 White queen
+		//9814 White rook
+		//9815 White bishop
+		//9816 White knight
+		//9817 White pawn
+		//9818 Black king
+		//9819 Black queen
+		//9820 Black rook
+		//9821 Black bishop
+		//9822 Black knight
+		//9823 Black pawn
+		function graphicDraw(){//-1/1-1 -2/0/2 -1/0*-1 1/0
+			for(let i = 0; i < 8; i++){
+				for(let j = 0; j < 8; j++){
+					//temp = getElementById((""+i)+j)
+					if(debug){console.log("piece at "+i+j+" selected")}
+					piece = 0
+					if(board[i][j][0] == "p"){
+						if(debug){console.log("pawn selected")}
+						piece = 6
+					}
+					else if(board[i][j][0] == "r"){
+						if(debug){console.log("rook selected")}
+						piece = 3
+					}
+					else if(board[i][j][0] == "k"){
+						if(debug){console.log("knight selected")}
+						piece = 5
+					}
+					else if(board[i][j][0] == "b"){
+						if(debug){console.log("bishop selected")}
+						piece = 4
+					}
+					else if(board[i][j][0] == "K"){
+						if(debug){console.log("king selected")}
+						piece = 1
+					}
+					else if(board[i][j][0] == "Q"){
+						if(debug){console.log("queen selected")}
+						piece = 2
+					}
+					if(piece == 0) {
+						if(debug){console.log("no piece found")}
+						document.getElementById((''+i)+j).innerHTML = '';
+					}
+					else {
+						unicode = ((9811+(piece))+(6*(((board[i][j][1])-1)/-2)))
+						//getElementById((""+i)+j).value="&#"+unicode+";"
+						document.getElementById((''+i)+j).innerHTML = '&#'+unicode+';';
+					}
+				}
+			}
+		}
+		reset()
+		whiteTurn = 1
+		graphicDraw()
+	</script>
+	<style>
+		.grid-item {
+			transition-timing-function:linear;
+			transition:background-color 0.5s;
+		}
+		.grid-item:hover {
+			background-color:lime;
+		}
+	</style>
 </body>
