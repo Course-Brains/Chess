@@ -50,6 +50,13 @@
 			if(debug){console.log("castle prereq reset")}
 		}
 		function RBQ(beginX, beginY, endX, endY, X, Y, piece){
+			beginX = parseInt(beginX)
+			beginY = parseInt(beginY)
+			endX = parseInt(endX)
+			endY = parseInt(endY)
+			X = parseInt(X)
+			Y = parseInt(Y)
+			if(debug){console.log(""+beginX+beginY+endX+endY+X+Y+piece)}
 			end = false
 			count = 1
 			while(end==false){
@@ -213,24 +220,24 @@
 			else if(board[beginX][beginY][0] == "r"){//rook
 				if(debug){console.log("rook selected")}
 				if(endX == beginX){//if it is moving on the x axis
-					if(debug){console.log("X axis movement selected")}
-					if(endX < beginX){//if it is moving left
-						if(debug){console.log("left movement selected")}
-						if(RBQ(beginX,beginY,endX,endY,0,1,"r")){return(true)}
+					if(debug){console.log("Y axis moving")}
+					if(endY < beginY){//if it is moving left
+						if(debug){console.log("moving forward")}
+						return(RBQ(beginX,beginY,endX,endY,0,1,"r"))
 					}
 					else{
-						if(debug){console.log("moving right")}
-						if(RBQ(beginX,beginY,endX,endY,0,-1,"r")){return(true)}
+						if(debug){console.log("moving backwards")}
+						return(RBQ(beginX,beginY,endX,endY,0,-1,"r"))
 					}
 				}
 				else if(endY == beginY){//if it is moving on the y axis
 					if(beginX < endX){//if it is moving down
-						if(debug){console.log("moving down")}
-						if(RBQ(beginX,beginY,endX,endY,1,0,"r")){return(true)}
+						if(debug){console.log("moving right")}
+						return(RBQ(beginX,beginY,endX,endY,1,0,"r"))
 					}
 					else{
-						if(debug){console.log("moving up")}
-						if(RBQ(beginX,beginY,endX,endY,-1,0,"r")){return(true)}
+						if(debug){console.log("moving left")}
+						return(RBQ(beginX,beginY,endX,endY,-1,0,"r"))
 					}
 				}
 				else{alert("move a rook like a rook")}
@@ -238,8 +245,9 @@
 			else if(board[beginX][beginY][0]=="K"){//king
 				if((endX > beginX-2)&&(endX < beginX+2)){//checks if you are attempting to move to a valid x position
 					if((endY > beginY-2)&&(endY < beginY+2)){//same thing but for the y position
-						board[endX][endY].splice(0,2,"k",whiteTurn)
+						board[endX][endY].splice(0,2,"K",whiteTurn)
 						board[beginX][beginY].splice(0,2,"n","a")
+						return(true)
 					}
 					else{alert("the king can ONLY move in a three by three area around it")}
 				}//yes there are two of them, but if I don't then it would be extra comlpicated
@@ -474,12 +482,12 @@
 				if(debug){console.log("continuing game")}
 			}
 			graphicDraw()
-			if(whiteTurn == -1){alert("it's black's turn")}
-			else if(whiteTurn == 1){alert("it's white's turn")}
-			else{
-				console.error("it is neither turn")
-				alert("Turn error")
-			}
+			//if(whiteTurn == -1){alert("it's black's turn")}
+			//else if(whiteTurn == 1){alert("it's white's turn")}
+			//else{
+			//	console.error("it is neither turn")
+			//	alert("Turn error")
+			//}
 		}
 	</script>
 </head>
@@ -496,10 +504,10 @@
 		var clickPos = [0,0]
 		var firstClick = true
 		if(window.innerWidth < window.innerHeight){
-			size = window.innerWidth-15
+			size = window.innerWidth-20
 		}
 		else{
-			size = window.innerHeight-15
+			size = window.innerHeight-20
 		}
 		for(let i = 7; i > -1; i--){
 			for(let j = 0; j < 8; j++){
