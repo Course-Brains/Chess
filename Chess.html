@@ -77,6 +77,11 @@
 			}
 		}
 		function move(beginX, beginY, endX, endY) {
+			beginX = parseInt(beginX)
+			beginY = parseInt(beginY)
+			endX = parseInt(endX)
+			endY = parseInt(endY)
+			console.log("move", beginX, beginY, endX, endY)
 			if(board[beginX][beginY][0] == "n") {
 				alert("you can't move a non-existant piece")
 			}
@@ -343,9 +348,11 @@
 					if(board[i][j][0] == "K") {
 						if(board[i][j][1] == 1) {
 							whiteKing = true
+							if(debug){console.log("white king found")}
 						}
 						if(board[i][j][1] == -1) {
 							blackKing = true
+							if(debug){console.log("black king found")}
 						}					
 					}
 				}
@@ -449,22 +456,29 @@
 			}
 		}
 		function graphicStart(X,Y,x,y) {
-			move(X,Y,x,y)
-			whiteTurn = 1
-			failed = false
-			graphicDraw()
-			if(whiteTurn == 1){alert("it's white's turn")}
-			else if(whiteTurn == -1){alert("it's black's turn")}
-			else{
-				console.error("it is neither turn")
-				alert("Turn error")
+			if(debug){
+				console.log("coord 1 is "+X+Y)
+				console.log("coord 2 is "+x+y)
 			}
-			//failed = (!(move(X,Y,x,y)))
+			failed = false
+			failed = (!(move(X,Y,x,y)))
 			if(debug){console.log("movement done")}
 			if(!(failed)){
 				promotion()
 				whiteTurn *= -1
-				endcheck()
+				if(!(endcheck())){
+					if(debug){console.log("resetting")}
+					reset()
+					graphicDraw()
+				}
+				if(debug){console.log("continuing game")}
+			}
+			graphicDraw()
+			if(whiteTurn == -1){alert("it's black's turn")}
+			else if(whiteTurn == 1){alert("it's white's turn")}
+			else{
+				console.error("it is neither turn")
+				alert("Turn error")
 			}
 		}
 	</script>
@@ -493,7 +507,7 @@
 				var test = document.getElementById("test");
 				buttonShort.className = "grid-item"
 				buttonShort.setAttribute("id", ("" + j) + i)
-				if(debug){console.log(buttonShort.id)}
+				//if(debug){console.log(buttonShort.id)}
 				buttonShort.style.width = ((size/8)+"px")
 				buttonShort.style.height = ((size/8)+"px")
 				buttonShort.dataset.x = j
@@ -501,7 +515,7 @@
 				buttonShort.style.fontSize = size/10
 				buttonShort.innerHTML = (("" + j) + i)
 				test.appendChild(buttonShort);
-				if(debug){console.log("button made at " + j + i)}
+				//if(debug){console.log("button made at " + j + i)}
 				buttonShort.addEventListener("click", function() {
 					if(debug){
 						if(debug){console.log("previous click was at " + clickPos[0] + clickPos[1])}
@@ -533,9 +547,9 @@
 		//9822 Black knight
 		//9823 Black pawn
 		function graphicDraw(){//-1/1-1 -2/0/2 -1/0*-1 1/0
+			debug = false
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
-					//temp = getElementById((""+i)+j)
 					if(debug){console.log("piece at "+i+j+" selected")}
 					piece = 0
 					if(board[i][j][0] == "p"){
@@ -568,11 +582,11 @@
 					}
 					else {
 						unicode = ((9811+(piece))+(6*(((board[i][j][1])-1)/-2)))
-						//getElementById((""+i)+j).value="&#"+unicode+";"
 						document.getElementById((''+i)+j).innerHTML = '&#'+unicode+';';
 					}
 				}
 			}
+			debug = true
 		}
 		reset()
 		whiteTurn = 1
