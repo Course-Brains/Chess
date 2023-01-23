@@ -311,7 +311,7 @@
 				else if((beginX == endX)||(beginY == endY)){
 					if(endX == beginX){//if it is moving on the x axis
 						if(debug){console.log("X axis movement selected")}
-						if(endX < beginX){//if it is moving left
+						if(endY > beginY){//if it is moving left
 							if(debug){console.log("left movement selected")}
 							if(RBQ(beginX,beginY,endX,endY,0,1,"Q")){return(true)}
 						}
@@ -321,7 +321,7 @@
 						}
 					}
 					else if(endY == beginY){//if it is moving on the y axis
-						if(beginX < endX){//if it is moving down
+						if(beginX > endX){//if it is moving down
 							if(debug){console.log("moving down")}
 							if(RBQ(beginX,beginY,endX,endY,1,0,"Q")){return(true)}
 						}
