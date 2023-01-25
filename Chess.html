@@ -118,9 +118,9 @@
 									while((count < 4)&&(valid)){
 										if(debug){
 											console.log("checking " + count)
-											console.log(board[beginX][count])
+											console.log(board[count][beginY])
 										}
-										if(!(board[beginX][count][1] == "a")){valid = false}
+										if(!(board[count][beginY][1] == "a")){valid = false}
 										if(debug){console.log(valid)}
 										count++
 									}
