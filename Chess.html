@@ -116,19 +116,25 @@
 								if(beginX == 0){
 									if(debug){console.log("left side")}
 									while((count < 4)&&(valid)){
-										if(debug){console.log("checking " + count)}
-										if(board[beginX][count][1] == whiteTurn){valid = false}
+										if(debug){
+											console.log("checking " + count)
+											console.log(board[beginX][count])
+										}
+										if(!(board[beginX][count][1] == "a")){valid = false}
 										if(debug){console.log(valid)}
 										count++
 									}
 								}
 								else{
 									if(debug){console.log("right side")}
-									while((count > 4)&&(valid)){
-										if(debug){console.log("checking " + count)}
-										if(board[beginX][6-count][1] == whiteTurn){valid = false}
+									while((count < 3)&&(valid)){
+										if(debug){
+											console.log("checking " + count)
+											console.log(board[7-count][beginY])
+										}
+										if(!(board[7-count][beginY][1] == "a")){valid = false}
 										if(debug){console.log(valid)}
-										count--
+										count++
 									}
 								}
 								if(valid){
