@@ -14,8 +14,18 @@
 		if(debug){
 			console.warn("debug mode/dev tools are on")
 			function override(X,Y,piece,team){
+				if(piece == null){piece = "n"}
+				if(team == null){piece = "a"}
 				board[X][Y].splice(0,2,piece,team)
 				if(debug){console.log("piece at (" + X + "," + Y + ") changed")}
+			}
+			function clear(){
+				if(debug){console.log("clearing")}
+				for(let i = 0; i < 8; i++){
+					for(let j = 0; j < 8; j++){
+						board[i][j].splice(0,2,"n","a")
+					}
+				}
 			}
 		}
 		function reset() {
@@ -49,14 +59,14 @@
 			moved = [false, false, false, false, false, false]
 			if(debug){console.log("castle prereq reset")}
 		}
-		function RBQ(beginX, beginY, endX, endY, X, Y, piece){
+		function RBQ(beginX, beginY, endX, endY, x, y, piece){
 			beginX = parseInt(beginX)
 			beginY = parseInt(beginY)
 			endX = parseInt(endX)
 			endY = parseInt(endY)
-			X = parseInt(X)
-			Y = parseInt(Y)
-			if(debug){console.log(""+beginX+beginY+endX+endY+X+Y+piece)}
+			x = parseInt(x)
+			y = parseInt(y)
+			if(debug){console.log(""+beginX+beginY+endX+endY+x+y+piece)}
 			end = false
 			count = 1
 			while(end==false){
@@ -64,9 +74,9 @@
 				if(debug){
 					console.log("count = " + (count))
 					console.log("end true")
-					console.log("current square contains "+ board[beginX+(X*count)][beginY+(Y*count)])
+					console.log("current square contains "+ board[beginX+(x*count)][beginY+(y*count)])
 				}
-				if(((beginX+(X*count)) == endX)&&(beginY+(Y*count)) == endY){
+				if(((beginX+(x*count)) == endX)&&(beginY+(y*count)) == endY){
 					if(debug){console.log("End reached/completing move")}
 					board[beginX][beginY].splice(0,2,"n","a");
 					board[endX][endY].splice(0,2,piece,whiteTurn);
@@ -74,12 +84,12 @@
 					moved[(((beginX/7)*2)+((whiteTurn+1)*1.5))] = true
 					return(true)
 				}
-				if(board[beginX+(X*count)][beginY+(Y*count)][1] == whiteTurn){
+				if(board[beginX+(x*count)][beginY+(y*count)][1] == whiteTurn){
 					if(debug){console.log("attempted friendly noclip")}
 					end = true
 					
 				}
-				if(board[beginX+(X*count)][beginY+(Y*count)][1] == (-1*whiteTurn)){
+				if(board[beginX+(x*count)][beginY+(y*count)][1] == (-1*whiteTurn)){
 					end = true
 					if(debug){console.log("attempted enemy noclip")}
 					alert("you can't move through enemy pieces")
@@ -92,7 +102,7 @@
 			beginY = parseInt(beginY)
 			endX = parseInt(endX)
 			endY = parseInt(endY)
-			console.log("move", beginX, beginY, endX, endY)
+			if(debug){console.log("move", beginX, beginY, endX, endY)}
 			if(board[beginX][beginY][0] == "n") {
 				alert("you can't move a non-existant piece")
 			}
@@ -231,7 +241,7 @@
 				if(debug){console.log("rook selected")}
 				if(endX == beginX){//if it is moving on the x axis
 					if(debug){console.log("Y axis moving")}
-					if(endY < beginY){//if it is moving left
+					if(endY > beginY){//if it is moving left
 						if(debug){console.log("moving forward")}
 						return(RBQ(beginX,beginY,endX,endY,0,1,"r"))
 					}
@@ -240,13 +250,13 @@
 						return(RBQ(beginX,beginY,endX,endY,0,-1,"r"))
 					}
 				}
-				else if(endY == beginY){//if it is moving on the y axis
+				else if(endY == beginY){//if it is moving on the x axis
 					if(beginX < endX){//if it is moving down
-						if(debug){console.log("moving right")}
+						if(debug){console.log("moving left")}
 						return(RBQ(beginX,beginY,endX,endY,1,0,"r"))
 					}
 					else{
-						if(debug){console.log("moving left")}
+						if(debug){console.log("moving right")}
 						return(RBQ(beginX,beginY,endX,endY,-1,0,"r"))
 					}
 				}
@@ -499,14 +509,6 @@
 			//	alert("Turn error")
 			//}
 		}
-		function clear(){
-			if(debug){console.log("clearing")}
-			for(let i = 0; i < 8; i++){
-				for(let j = 0; j < 8; j++){
-					board[i][j].splice(0,2,"n","a")
-				}
-			}
-		}
 	</script>
 </head>
 <body>
@@ -533,7 +535,6 @@
 				var test = document.getElementById("test");
 				buttonShort.className = "grid-item"
 				buttonShort.setAttribute("id", ("" + j) + i)
-				//if(debug){console.log(buttonShort.id)}
 				buttonShort.style.width = ((size/8)+"px")
 				buttonShort.style.height = ((size/8)+"px")
 				buttonShort.dataset.x = j
@@ -541,7 +542,6 @@
 				buttonShort.style.fontSize = size/10
 				buttonShort.innerHTML = (("" + j) + i)
 				test.appendChild(buttonShort);
-				//if(debug){console.log("button made at " + j + i)}
 				buttonShort.addEventListener("click", function() {
 					if(debug){
 						if(debug){console.log("previous click was at " + clickPos[0] + clickPos[1])}
