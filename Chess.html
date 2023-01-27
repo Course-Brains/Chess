@@ -1,7 +1,8 @@
 <head>
 	<script>
 		var debug = true;
-		board = []
+		var board = []
+		var log = []
 		for(let i = 0; i < 9; i++){
 			temp = []
 			for(let j = 0; j < 9; j++){
@@ -28,7 +29,10 @@
 				}
 			}
 		}
-		function reset() {
+		function reset(logReset) {
+			if(logReset){
+				log = []
+			}
 			console.log("resetting")
 			for(let i = -1; i < 2; i += 2){
 				if(debug){console.log("drawing for team " + i)}
@@ -393,14 +397,14 @@
 				else{
 					if(debug){console.log("black victory")}
 					alert("black wins!")
-					reset()
+					reset(true)
 					return(false)
 				}
 			}
 			else if(blackKing == false){
 				if(debug){console.log("white victory")}
 				alert("white wins!")
-				reset()
+				reset(true)
 				return(false)
 			}
 			else {
@@ -430,7 +434,7 @@
 		}
 		function start() {
 			playing = true
-			reset()
+			reset(true)
 			quit = false
 			while(playing){
 				failed = false
@@ -483,6 +487,22 @@
 				}
 			}
 		}
+		/*function moveLogger(beginX,beginY,endX,endY){
+			if(debug){console.log("logging move")}
+			log.push([beginX,beginY,endX,endY])
+		}
+		function moveReader(instance){
+			if(debug){console.log("resetting board")}
+			reset(false)
+			for(let i = 0; i < log.length; i++){
+				current = log[i]
+				if(debug){console.log("inputting move " + current)}
+				graphicStart(current[0],current[1],current[2],current[3])
+			graphicDraw()
+			}
+			if(debug){console.log("drawing")}
+			graphicDraw()
+		}*/
 		function graphicStart(X,Y,x,y) {
 			if(debug){
 				console.log("coord 1 is "+X+Y)
@@ -494,9 +514,10 @@
 			if(!(failed)){
 				promotion()
 				whiteTurn *= -1
+				//moveLogger(X,Y,x,y)
 				if(!(endcheck())){
 					if(debug){console.log("resetting")}
-					reset()
+					reset(true)
 					graphicDraw()
 				}
 				if(debug){console.log("continuing game")}
@@ -575,6 +596,7 @@
 		function graphicDraw(){//-1/1-1 -2/0/2 -1/0*-1 1/0
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
+					let item = document.getElementById((''+i)+j)
 					piece = 0
 					if(board[i][j][0] == "p"){
 						piece = 6
@@ -595,26 +617,95 @@
 						piece = 2
 					}
 					if(piece == 0) {
-						document.getElementById((''+i)+j).innerHTML = '';
+						item.innerHTML = '';
 					}
 					else {
 						unicode = ((9811+(piece))+(6*(((board[i][j][1])-1)/-2)))
-						document.getElementById((''+i)+j).innerHTML = '&#'+unicode+';';
+						item.innerHTML = '&#'+unicode+';';
 					}
 				}
 			}
 		}
-		reset()
+		function gamerMode() {
+			for(let i = 0; i < 8; i++){
+				for(let j = 0; j < 8; j++){
+					let item = document.getElementById((''+i)+j)
+					if(item.classList.contains('gamer-mode')){
+						item.classList.remove('rgb')
+						item.classList.remove('gamer-mode')
+					}
+					else{
+						item.classList.add('gamer-mode')
+						item.classList.remove('rgb')
+					}
+				}
+			}
+			graphicDraw()
+		}
+		function rgb() {
+			for(let i = 0; i < 8; i++){
+				for(let j = 0; j < 8; j++){
+					let item = document.getElementById((''+i)+j)
+					if(item.classList.contains('rgb')){
+						item.classList.remove('rgb')
+						item.classList.remove('gamer-mode')
+					}
+					else{
+						item.classList.add('gamer-mode')
+						item.classList.add('rgb')
+					}
+				}
+			}
+			graphicDraw()
+		}
+		reset(true)
 		whiteTurn = 1
 		graphicDraw()
 	</script>
 	<style>
+		@keyframes rgbcolors {
+			0% {background: #ee6055;}
+			25% {background: #60d394;}
+			50% {background: #aaf683;}
+			75% {background: #ffd97d;}
+			100% {background: #ff9b85;}
+		}
 		.grid-item {
 			transition-timing-function:linear;
 			transition:background-color 0.5s;
 		}
 		.grid-item:hover {
 			background-color:lime;
+		}
+		[data-x='0'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(204,0,1),rgb(251,148,11));
+		}
+		[data-x='1'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(251,148,11),rgb(255,255,1));
+		}
+		[data-x='2'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(255,255,1),rgb(1,204,0));
+		}
+		[data-x='3'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(1,204,0),rgb(3,192,198));
+		}
+		[data-x='4'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(3, 192, 198),rgb(0,0,254));
+		}
+		[data-x='5'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(0,0,254),rgb(118,44,167));
+		}
+		[data-x='6'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(118,44,167),rgb(254,152,191));
+		}
+		[data-x='7'].gamer-mode {
+			background-image: linear-gradient(to right,rgb(254,152,191),rgb(204,0,1));
+		}
+		.rgb{
+			animation-name: rgbcolors;
+			animation-duration: 10s;
+			animation-iteration-count: infinite;
+			animation-direction: alternate;
 		}
 	</style>
 </body>
