@@ -16,7 +16,7 @@
 			console.warn("debug mode/dev tools are on")
 			function override(X,Y,piece,team){
 				if(piece == null){piece = "n"}
-				if(team == null){piece = "a"}
+				if(team == null){team = "a"}
 				board[X][Y].splice(0,2,piece,team)
 				if(debug){console.log("piece at (" + X + "," + Y + ") changed")}
 			}
@@ -85,7 +85,7 @@
 					board[beginX][beginY].splice(0,2,"n","a");
 					board[endX][endY].splice(0,2,piece,whiteTurn);
 					if(debug){console.log("move done")}
-					moved[(((beginX/7)*2)+((whiteTurn+1)*1.5))] = true
+					moved[(beginY/(2+(1/3)))+beginX/3.5] = true
 					return(true)
 				}
 				if(board[beginX+(x*count)][beginY+(y*count)][1] == whiteTurn){
@@ -123,6 +123,17 @@
 						if((beginX == 0)||(beginX == 7)){
 							if(debug){console.log("back row")}
 							if((beginY == 0)||(beginY == 7)){
+								if(moved[(beginY/(2+(1/3)))+1]){
+									if(debug){console.log("king hasn't moved")}
+									if(moved[(beginY/(2+(1/3)))+beginX/3.5]){
+										if(debug){console.log("pieces haven't moved")}
+									}
+									else{
+										if(debug){console.log("pieces have moved")}
+										alert("invalid castle")
+										return(false)
+									}
+								}
 								if(debug){console.log("top/bottom")}			
 								var valid = true
 								if(debug){console.log("starting empty check")}
@@ -158,6 +169,8 @@
 									if(debug){console.log("pieces cleared")}
 									board[Math.abs((beginX)-1)][beginY].splice(0,2,"K",whiteTurn)
 									board[Math.abs((beginX)-2)][beginY].splice(0,2,"r",whiteTurn)
+									moved[(beginY/(2+(1/3)))+1] = true
+									moved[(beginY/(2+(1/3)))+beginX/3.5] = true
 									return(true)
 								}
 							}
@@ -271,6 +284,7 @@
 					if((endY > beginY-2)&&(endY < beginY+2)){//same thing but for the y position
 						board[endX][endY].splice(0,2,"K",whiteTurn)
 						board[beginX][beginY].splice(0,2,"n","a")
+						moved[(beginY/(2+(1/3)))+1] = true
 						return(true)
 					}
 					else{alert("the king can ONLY move in a three by three area around it")}
