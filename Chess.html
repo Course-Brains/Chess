@@ -501,22 +501,6 @@
 				}
 			}
 		}
-		/*function moveLogger(beginX,beginY,endX,endY){
-			if(debug){console.log("logging move")}
-			log.push([beginX,beginY,endX,endY])
-		}
-		function moveReader(instance){
-			if(debug){console.log("resetting board")}
-			reset(false)
-			for(let i = 0; i < log.length; i++){
-				current = log[i]
-				if(debug){console.log("inputting move " + current)}
-				graphicStart(current[0],current[1],current[2],current[3])
-			graphicDraw()
-			}
-			if(debug){console.log("drawing")}
-			graphicDraw()
-		}*/
 		function graphicStart(X,Y,x,y) {
 			if(debug){
 				console.log("coord 1 is "+X+Y)
@@ -528,7 +512,6 @@
 			if(!(failed)){
 				promotion()
 				whiteTurn *= -1
-				//moveLogger(X,Y,x,y)
 				if(!(endcheck())){
 					if(debug){console.log("resetting")}
 					reset(true)
@@ -537,12 +520,6 @@
 				if(debug){console.log("continuing game")}
 			}
 			graphicDraw()
-			//if(whiteTurn == -1){alert("it's black's turn")}
-			//else if(whiteTurn == 1){alert("it's white's turn")}
-			//else{
-			//	console.error("it is neither turn")
-			//	alert("Turn error")
-			//}
 		}
 	</script>
 </head>
