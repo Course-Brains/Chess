@@ -2,7 +2,6 @@
 	<script>
 		var debug = true;
 		var board = []
-		var log = []
 		for(let i = 0; i < 9; i++){
 			temp = []
 			for(let j = 0; j < 9; j++){
@@ -429,7 +428,7 @@
 		function promotion(){
 			if(debug){console.log("promotion check begin")}
 			var row = ((whiteTurn+1)*3.5)
-			var valid = ["k","r","b","Q"]
+			var valid = ["knight","rook","bishop","queen"]
 			if(debug){console.log("row: " + row)}
 			for(let i = 0; i < 8; i++){
 				if(debug){console.log("checking column " + i)}
@@ -441,6 +440,11 @@
 					}
 					while(!(valid.includes(input)))
 					if(debug){console.log("input valid")}
+					if(input == "knight"){input = "k"}
+					else if(input == "rook"){input = "r"}
+					else if(input == "bishop"){input = "b"}
+					else if(input == "queen"){input = "Q"}
+					else{console.error("promotion input change error")}
 					board[i][row].splice(0,2,input,whiteTurn)
 					if(debug){console.log("Promotion done")}
 				}
@@ -501,6 +505,23 @@
 				}
 			}
 		}
+		/*var turn = 0
+		var log = []
+		function logger(toLog){
+			if(toLog == null){
+				for(let i = 0; i < 8; i++){
+					let temp = []
+					for(let j = 0; j < 8; j++){
+						temp.splice(([...board[i][j]]))
+					}
+					log[turn].push(temp)
+				}
+				turn += 1
+			}
+			else{
+				board = [...log[toLog]]
+			}
+		}*/
 		function graphicStart(X,Y,x,y) {
 			if(debug){
 				console.log("coord 1 is "+X+Y)
