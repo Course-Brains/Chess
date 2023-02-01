@@ -2,6 +2,7 @@
 	<script>
 		var debug = true;
 		var board = []
+		var darkmode = false
 		for(let i = 0; i < 9; i++){
 			temp = []
 			for(let j = 0; j < 9; j++){
@@ -27,6 +28,14 @@
 					}
 				}
 			}
+		}
+		//function created by chatGPT
+		function deepCopy3DArray(arr) {
+			return arr.map(function(layer) {
+				return layer.map(function(row) {
+					return row.slice();
+				});
+			});
 		}
 		function reset(logReset) {
 			if(logReset){
@@ -505,23 +514,23 @@
 				}
 			}
 		}
-		/*var turn = 0
+		var turn = 0
 		var log = []
 		function logger(toLog){
 			if(toLog == null){
-				for(let i = 0; i < 8; i++){
-					let temp = []
-					for(let j = 0; j < 8; j++){
-						temp.splice(([...board[i][j]]))
-					}
-					log[turn].push(temp)
-				}
+				log.push(deepCopy3DArray(board))
 				turn += 1
+				if(debug){console.log("saving board")}
 			}
 			else{
 				board = [...log[toLog]]
+				turn = toLog
+				if(debug){console.log("loading board")}
 			}
-		}*/
+		}
+		function undo(){
+			logger(turn-1)
+		}
 		function graphicStart(X,Y,x,y) {
 			if(debug){
 				console.log("coord 1 is "+X+Y)
@@ -539,12 +548,13 @@
 					graphicDraw()
 				}
 				if(debug){console.log("continuing game")}
+				logger()
 			}
 			graphicDraw()
 		}
 	</script>
 </head>
-<body>
+<body id:body;>
 	<div id="test" class="grid-container"></div>
 	<style>
 		.grid-container {
@@ -609,6 +619,7 @@
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
 					let item = document.getElementById((''+i)+j)
+					let team = board[i][j][1]
 					piece = 0
 					if(board[i][j][0] == "p"){
 						piece = 6
@@ -642,13 +653,18 @@
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
 					let item = document.getElementById((''+i)+j)
+					let body = document.getElementById('body')
 					if(item.classList.contains('gamer-mode')){
 						item.classList.remove('rgb')
 						item.classList.remove('gamer-mode')
+						item.classList.remove('dark-mode')
+						document.body.classList.remove('dark-mode')
 					}
 					else{
 						item.classList.add('gamer-mode')
 						item.classList.remove('rgb')
+						item.classList.remove('dark-mode')
+						document.body.classList.remove('dark-mode')
 					}
 				}
 			}
@@ -658,17 +674,42 @@
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
 					let item = document.getElementById((''+i)+j)
+					let body = document.getElementById('body')
 					if(item.classList.contains('rgb')){
 						item.classList.remove('rgb')
 						item.classList.remove('gamer-mode')
+						item.classList.remove('dark-mode')
+						document.body.classList.remove('dark-mode')
 					}
 					else{
 						item.classList.add('gamer-mode')
 						item.classList.add('rgb')
+						item.classList.remove('dark-mode')
+						document.body.classList.remove('dark-mode')
 					}
 				}
 			}
 			graphicDraw()
+		}
+		function darkMode(){
+			for(let i = 0; i < 8; i++){
+				for(let j = 0; j < 8; j++){
+					let item = document.getElementById((''+i)+j)
+					let body = document.getElementById('body')
+					if(item.classList.contains('dark-mode')){
+						item.classList.remove('rgb')
+						item.classList.remove('gamer-mode')
+						item.classList.remove('dark-mode')
+						document.body.classList.remove('dark-mode')
+					}
+					else{
+						item.classList.add('dark-mode')
+						item.classList.remove('rgb')
+						item.classList.remove('gamer-mode')
+						document.body.classList.add('dark-mode')
+					}
+				}
+			}
 		}
 		reset(true)
 		whiteTurn = 1
@@ -718,6 +759,10 @@
 			animation-duration: 10s;
 			animation-iteration-count: infinite;
 			animation-direction: alternate;
+		}
+		.dark-mode {
+			background-color:black;
+			color:white;
 		}
 	</style>
 </body>
