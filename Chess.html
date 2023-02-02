@@ -657,22 +657,26 @@
 				for(let j = 0; j < 8; j++){
 					let item = document.getElementById((''+i)+j)
 					document.body.classList.remove('dark-mode')
-					item.className = ''
-					if(change == 'rgb'){
-						item.classList.add('gamer-mode')
-						//needs to add 'gamer-mode' because rgb doesn't work without it
+					if(item.classList.contains(change)){
+						item.className = ''
 					}
 					else{
+						item.className = ''
+						if(change == 'rgb'){
+							item.classList.add('gamer-mode')
+							//needs to add 'gamer-mode' because rgb doesn't work without it
+						}
 						if(change == 'checker'){
-							if(((i%2)-(j%2)) == 0){
+							if(((i%2)+(j%2)) == 1){
 								item.classList.add('checker')
 							}
 						}
+						else if(change == 'dark-mode'){
+							document.body.classList.add('dark-mode')
+							item.classList.add(change)
+						}
 						else{
 							item.classList.add(change)
-							if(change == 'dark-mode'){
-								document.body.classList.add('dark-mode')
-							}
 						}
 					}
 				}
@@ -694,6 +698,7 @@
 			transition-timing-function:linear;
 			transition:background-color 0.5s;
 			color:black;
+			background-image:none;
 		}
 		.grid-item:hover {
 			background-color:lime;
