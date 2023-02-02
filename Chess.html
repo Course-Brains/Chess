@@ -525,11 +525,14 @@
 			else{
 				board = [...log[toLog]]
 				turn = toLog
+				if(turn%2 == 0){
+					whiteTurn = -1
+				}
 				if(debug){console.log("loading board")}
 			}
 		}
 		function undo(){
-			logger(turn-1)
+			logger(turn-2)
 		}
 		function graphicStart(X,Y,x,y) {
 			if(debug){
@@ -663,7 +666,7 @@
 							//needs to add 'gamer-mode' because rgb doesn't work without it
 						}
 						if(change == 'checker'){
-							if(((i%2)+(j%2)) == 1){
+							if(((i%2)-(j%2)) == 0){
 								item.classList.add('checker')
 							}
 						}
@@ -689,6 +692,7 @@
 		.grid-item {
 			transition-timing-function:linear;
 			transition:background-color 0.5s;
+			color:black;
 		}
 		.grid-item:hover {
 			background-color:lime;
