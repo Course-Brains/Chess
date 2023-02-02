@@ -656,15 +656,13 @@
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
 					let item = document.getElementById((''+i)+j)
-					let body = document.getElementById('body')
-					if(item.classList.contains(change)){
-						item.className = ''
+					document.body.classList.remove('dark-mode')
+					item.className = ''
+					if(change == 'rgb'){
+						item.classList.add('gamer-mode')
+						//needs to add 'gamer-mode' because rgb doesn't work without it
 					}
 					else{
-						if(change == 'rgb'){
-							item.classList.add('gamer-mode')
-							//needs to add 'gamer-mode' because rgb doesn't work without it
-						}
 						if(change == 'checker'){
 							if(((i%2)-(j%2)) == 0){
 								item.classList.add('checker')
@@ -672,6 +670,9 @@
 						}
 						else{
 							item.classList.add(change)
+							if(change == 'dark-mode'){
+								document.body.classList.add('dark-mode')
+							}
 						}
 					}
 				}
