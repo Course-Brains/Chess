@@ -1,6 +1,10 @@
 <head>
 	<script>
-		var debug = true;
+		if (window.location.protocol === "file:") {
+			var debug = true
+		} else {
+			var debug = false
+		}
 		var board = []
 		var p2move = []
 		for(let i = 0; i < 16; i++){
@@ -14,7 +18,10 @@
 			board.push(temp)
 		}
 			whiteTurn = 1
-		var moved = [false,false,false,false,false,false]//this is for castling, it tracks if a piece has moved yet, the first three are for white with 1: left rook 2: king 3: right rook, then the other ones are the same but for black
+		var moved = []
+		for(let i = 0; i < 6; i++){
+			moved.push(false)
+		}
 		if(debug){
 			console.warn("debug mode/dev tools are on")
 			function override(X,Y,piece,team){
