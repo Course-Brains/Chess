@@ -2,7 +2,10 @@
 	<script>
 		var debug = true;
 		var board = []
-		var darkmode = false
+		var p2move = []
+		for(let i = 0; i < 16; i++){
+			p2move.push(false)
+		}
 		for(let i = 0; i < 9; i++){
 			temp = []
 			for(let j = 0; j < 9; j++){
@@ -192,6 +195,19 @@
 				if(debug){console.log("pawn selected")}
 				if((endY == beginY + whiteTurn)&&(endX == beginX - 1)) {//checks if you are trying to move forward 1 and left 1
 					if(debug){console.log("attempted to attack left")}
+					if(board[endX][beginY][0] == "p"){
+						if(debug){console.log("attempted en passant")}
+							if((p2move[endX+((whiteTurn+1)*4)]) == true){
+								if(board[endX][endY][0] = "n"){
+									if(debug){console.log("valid en passant")}
+									board[beginX][beginY].length = 0
+									board[endX][endY].splice(0,2,"p",(whiteTurn))
+									board[endX][beginY].length = 0
+									if(debug){console.log("move done")}
+									return(true)
+								}
+							}
+					}
 					if(board[endX][endY][1] == (-1*whiteTurn)){//checks if the end position has an enemy piece
 						board[endX][endY].splice(0,2,"p",whiteTurn)//changes the end position to a pawn
 						board[beginX][beginY].splice(0,2,"n","a")//changes the begining position to nothing
@@ -202,6 +218,19 @@
 				}
 				else if((endY == beginY + whiteTurn)&&(endX == beginX + 1)){//same thing but to the right
 					if(debug){console.log("attempted attack right")}
+					if(board[endX][beginY][0] == "p"){
+						if(debug){console.log("attempted en passant")}
+							if((p2move[endX+((whiteTurn+1)*4)]) == true){
+								if(board[endX][endY][0] = "n"){
+									if(debug){console.log("valid en passant")}
+									board[beginX][beginY].length = 0
+									board[endX][endY].splice(0,2,"p",(whiteTurn))
+									board[endX][beginY].length = 0
+									if(debug){console.log("move done")}
+									return(true)
+								}
+							}
+					}
 					if(board[endX][endY][1] == (-1*whiteTurn)){//same thing as before
 						board[endX][endY].splice(0,2,"p",whiteTurn)
 						board[beginX][beginY].splice(0,2,"n","a")
@@ -226,12 +255,14 @@
 						if(debug){console.log("double move first step validated")}
 						if((whiteTurn == 1)&&(beginY==1)){
 							if(debug){console.log("double move second step validated")}
+							p2move[beginX+(((-1*whiteTurn)+1)*4)] = true
 							board[beginX][beginY].splice(0,2,"n","a")
 							board[endX][endY].splice(0,2,"p",whiteTurn)
 							return(true)
 						}
 						else if((whiteTurn == -1)&&(beginY==6)){
 							if(debug){console.log("double move second step validated")}
+							p2move[beginX+(((-1*whiteTurn)+1)*4)] = true
 							board[beginX][beginY].splice(0,2,"n","a")
 							board[endX][endY].splice(0,2,"p",whiteTurn)
 							return(true)
