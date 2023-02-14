@@ -54,14 +54,13 @@
 			if(debug){console.log("resetting")}
 			for(let i = -1; i < 2; i += 2){
 				if(debug){console.log("drawing for team " + i)}
-				board[0][((i-1)/-2)*7].splice(0,2,"r",i)
-				board[1][((i-1)/-2)*7].splice(0,2,"k",i)
-				board[2][((i-1)/-2)*7].splice(0,2,"b",i)
+				for(let j = 0; j < 2; j++){
+					board[j*7][((i-1)/-2)*7].splice(0,2,"r",i)
+					board[(j*5)+1][((i-1)/-2)*7].splice(0,2,"k",i)
+					board[(j*3)+2][((i-1)/-2)*7].splice(0,2,"b",i)
+				}
 				board[3][((i-1)/-2)*7].splice(0,2,"Q",i)
 				board[4][((i-1)/-2)*7].splice(0,2,"K",i)
-				board[5][((i-1)/-2)*7].splice(0,2,"b",i)
-				board[6][((i-1)/-2)*7].splice(0,2,"k",i)
-				board[7][((i-1)/-2)*7].splice(0,2,"r",i)
 				if(debug){console.log("rear row for team " + i + " done")}
 				//rear rows^^^
 					for(let x = 0; x < 8; x++){
