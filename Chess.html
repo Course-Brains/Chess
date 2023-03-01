@@ -5,46 +5,40 @@
 		} else {
 			var debug = false
 		}
+		var alerts = false
 		var board = []
-		var p2move = []
-		for(let i = 0; i < 16; i++){
-			p2move.push(false)
-		}
 		for(let i = 0; i < 9; i++){
 			temp = []
 			for(let j = 0; j < 9; j++){
-				temp.push(["n","a"])
+				temp.push("")
 			}
 			board.push(temp)
 		}
 			whiteTurn = 1
-		var moved = []
-		for(let i = 0; i < 6; i++){
-			moved.push(false)
-		}
 		if(debug){
 			console.warn("debug mode/dev tools are on")
 			function override(X,Y,piece,team){
-				if(piece == null){piece = "n"}
-				if(team == null){team = "a"}
-				board[X][Y].splice(0,2,piece,team)
+				if((piece == null)||(team == null)){
+					board[X][Y] = new square
+				}
+				else{
+					board[X][Y] = new piece(team)
+				}
 				if(debug){console.log("piece at (" + X + "," + Y + ") changed")}
 			}
 			function clear(){
 				if(debug){console.log("clearing")}
 				for(let i = 0; i < 8; i++){
 					for(let j = 0; j < 8; j++){
-						board[i][j].splice(0,2,"n","a")
+						board[i][j] = new square
 					}
 				}
 			}
 		}
-		//function created by chatGPT
+		//function created by chatGPT, modified to work with classes
 		function deepCopy3DArray(arr) {
 			return arr.map(function(layer) {
-				return layer.map(function(row) {
-					return row.slice();
-				});
+				return layer.slice();
 			});
 		}
 		function reset(logReset) {
@@ -55,23 +49,24 @@
 			for(let i = -1; i < 2; i += 2){
 				if(debug){console.log("drawing for team " + i)}
 				for(let j = 0; j < 2; j++){
-					board[j*7][((i-1)/-2)*7].splice(0,2,"r",i)
-					board[(j*5)+1][((i-1)/-2)*7].splice(0,2,"k",i)
-					board[(j*3)+2][((i-1)/-2)*7].splice(0,2,"b",i)
+					board[j*7][((i-1)/-2)*7] = new rook(i)
+					board[(j*5)+1][((i-1)/-2)*7] = new knight(i)
+					board[(j*3)+2][((i-1)/-2)*7] = new bishop(i)
 				}
-				board[3][((i-1)/-2)*7].splice(0,2,"Q",i)
-				board[4][((i-1)/-2)*7].splice(0,2,"K",i)
+				board[3][((i-1)/-2)*7] = new queen(i)
+				board[4][((i-1)/-2)*7] = new king(i)
 				if(debug){console.log("rear row for team " + i + " done")}
 				//rear rows^^^
 					for(let x = 0; x < 8; x++){
-						board[x][(((i*-1)+1)*2.5)+1].splice(0,2,"p",i)
+						board[x][(((i*-1)+1)*2.5)+1] = new pawn(i)
+
 					}
 				if(debug){console.log("pawns for team " + i + " done")}
 				//pawn rows^^^
 			}
 			for(let j = 2; j < 6; j++){
 				for(let i = 0; i < 8; i++){
-					board[i][j].splice(0,2,"n","a")
+					board[i][j] = new square
 				}
 			}
 			if(debug){console.log("empty rows complete")}
@@ -87,7 +82,7 @@
 			endY = parseInt(endY)
 			x = parseInt(x)
 			y = parseInt(y)
-			if(debug){console.log(""+beginX+beginY+endX+endY+x+y+piece)}
+			if(debug){console.log(""+beginX+beginY+endX+endY+x+y)}
 			end = false
 			count = 1
 			while(end==false){
@@ -95,252 +90,273 @@
 				if(debug){
 					console.log("count = " + (count))
 					console.log("end true")
-					console.log("current square contains "+ board[beginX+(x*count)][beginY+(y*count)])
+					console.log("current square contains "+ board[beginX+(x*count)][beginY+(y*count)].piece)
 				}
 				if(((beginX+(x*count)) == endX)&&(beginY+(y*count)) == endY){
 					if(debug){console.log("End reached/completing move")}
-					board[beginX][beginY].splice(0,2,"n","a");
-					board[endX][endY].splice(0,2,piece,whiteTurn);
+					board[beginX][beginY] = new square
+					board[endX][endY] = new piece(whiteTurn)
 					if(debug){console.log("move done")}
-					moved[(beginY/(2+(1/3)))+beginX/3.5] = true
+					if(piece == rook){
+						board[endX][endY].moved = true
+					}
 					return(true)
 				}
 				if(board[beginX+(x*count)][beginY+(y*count)][1] == whiteTurn){
 					if(debug){console.log("attempted friendly noclip")}
+					if(alerts){alert("you can't move through your own pieces")}
 					end = true
 					
 				}
 				if(board[beginX+(x*count)][beginY+(y*count)][1] == (-1*whiteTurn)){
 					end = true
 					if(debug){console.log("attempted enemy noclip")}
-					alert("you can't move through enemy pieces")
+					if(alerts){alert("you can't move through enemy pieces")}
 				}
 			count += 1
 			}
 		}
-		function move(beginX, beginY, endX, endY) {
-			beginX = parseInt(beginX)
-			beginY = parseInt(beginY)
-			endX = parseInt(endX)
-			endY = parseInt(endY)
-			if(debug){console.log("move", beginX, beginY, endX, endY)}
-			if(board[beginX][beginY][0] == "n") {
-				alert("you can't move a non-existant piece")
+		class square {
+			constructor(){
+				this.team = 0
+				this.piece = 'square'
+				this.frozen = 0
+				this.mortal = true
 			}
-			else if(board[beginX][beginY][1]==(-1*whiteTurn)){//cheat prevention
-				alert("you can't move enemy pieces")
+			tick(){}
+			move(){
+				console.log('attempted movement of nothing')
+				if(alerts){alert("you think you're funny, don't you")}
 			}
-			else if((endX == beginX)&&(endY == beginY)){//makes sure the start and end aren't the same
-				alert("you have to actually move the piece")
+		}
+		class pawn {
+			constructor(team){
+				this.team = team
+				this.piece = "pawn"
+				this.doubleMoved = false
+				this.frozen = 0
+				this.mortal = true
 			}
-			else if(board[endX][endY][1] == whiteTurn){
-				if(board[beginX][beginY][0] == "r"){
-					if(board[endX][endY][0] == "K"){
-						if(debug){console.log("attempted castle")}
-						if((beginX == 0)||(beginX == 7)){
-							if(debug){console.log("back row")}
-							if((beginY == 0)||(beginY == 7)){
-								if(moved[(beginY/(2+(1/3)))+1]){
-									if(debug){console.log("king hasn't moved")}
-									if(moved[(beginY/(2+(1/3)))+beginX/3.5]){
-										if(debug){console.log("pieces haven't moved")}
-									}
-									else{
-										if(debug){console.log("pieces have moved")}
-										alert("invalid castle")
-										return(false)
-									}
-								}
-								if(debug){console.log("top/bottom")}			
-								var valid = true
-								if(debug){console.log("starting empty check")}
-								var count = 1
-								if(beginX == 0){
-									if(debug){console.log("left side")}
-									while((count < 4)&&(valid)){
-										if(debug){
-											console.log("checking " + count)
-											console.log(board[count][beginY])
-										}
-										if(!(board[count][beginY][1] == "a")){valid = false}
-										if(debug){console.log(valid)}
-										count++
-									}
-								}
-								else{
-									if(debug){console.log("right side")}
-									while((count < 3)&&(valid)){
-										if(debug){
-											console.log("checking " + count)
-											console.log(board[7-count][beginY])
-										}
-										if(!(board[7-count][beginY][1] == "a")){valid = false}
-										if(debug){console.log(valid)}
-										count++
-									}
-								}
-								if(valid){
-									if(debug){console.log("it worked")}
-									board[beginX][endY].splice(0,2,"n","a")
-									board[endX][endY].splice(0,2,"n","a")
-									if(debug){console.log("pieces cleared")}
-									board[Math.abs((beginX)-1)][beginY].splice(0,2,"K",whiteTurn)
-									board[Math.abs((beginX)-2)][beginY].splice(0,2,"r",whiteTurn)
-									moved[(beginY/(2+(1/3)))+1] = true
-									moved[(beginY/(2+(1/3)))+beginX/3.5] = true
-									return(true)
-								}
-							}
-						}
-					}
+			tick(){}
+			move(beginX, beginY, endX, endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
 				}
-				else{alert("You can't capture your own pieces")}
-			}
-			//Simple checks^^^
-			else if(board[beginX][beginY][0]=="p") { //pawn
 				if(debug){console.log("pawn selected")}
-				if((endY == beginY + whiteTurn)&&(endX == beginX - 1)) {//checks if you are trying to move forward 1 and left 1
-					if(debug){console.log("attempted to attack left")}
-					if(board[endX][beginY][0] == "p"){
-						if(debug){console.log("attempted en passant")}
-						if((p2move[endX+((whiteTurn+1)*4)]) == true){
-							if(board[endX][endY][0] = "n"){
-								if(moveLog[turn-1][4]){
+				if((endX == beginX - 1)&&(endY == beginY + this.team)){
+					if(debug){console.log('attempted diagonal movement left')}
+					if(endX == beginX - 1) {
+						if(debug){console.log("attempted to attack left")}
+						if((board[endX][beginY].piece == "pawn")&&(board[endX][beginY].team == (-1*whiteTurn))){
+							if(debug){console.log("attempted en passant")}
+							if(board[endX][beginY].doubleMoved == true){
+								if(debug){console.log('enemy piece double moved')}
+								if(board[endX][endY].piece == "square"){
+									if(debug){console.log('destination is clear')}
 									if(debug){console.log("valid en passant")}
-									board[beginX][beginY].splice(0,2,"n","a")
-									board[endX][endY].splice(0,2,"p",(whiteTurn))
-									board[endX][beginY].splice(0,2,"n","a")
+									board[beginX][beginY] = new square
+									board[endX][endY] = new pawn(whiteTurn)
+									board[endX][beginY] = new square
 									if(debug){console.log("move done")}
 									return(true)
 								}
 							}
 						}
+						else if(board[endX][endY].team == (-1*this.team)){
+							if(debug){console.log('valid attack left')}
+							board[beginX][beginY] = new square
+							board[endX][endY] = new pawn(this.team)
+							return(true)
+						}
+						else{if(alerts){alert("pawns can only ATTACK diagonally")}}
 					}
-					if(board[endX][endY][1] == (-1*whiteTurn)){//checks if the end position has an enemy piece
-						board[endX][endY].splice(0,2,"p",whiteTurn)//changes the end position to a pawn
-						board[beginX][beginY].splice(0,2,"n","a")//changes the begining position to nothing
-						if(debug){console.log("attack left verified/move done")}
-						return(true)
-					}
-					else{alert("pawns can only ATTACK diagonally")}
 				}
-				else if((endY == beginY + whiteTurn)&&(endX == beginX + 1)){//same thing but to the right
+				else if(endX == beginX + 1){
 					if(debug){console.log("attempted attack right")}
-					if(board[endX][beginY][0] == "p"){
+					if((board[endX][beginY].piece == "pawn")&&(board[endX][beginY].team == (-1*whiteTurn))){
 						if(debug){console.log("attempted en passant")}
-						if((p2move[endX+((whiteTurn+1)*4)]) == true){
-							if(board[endX][endY][0] = "n"){
-								if(moveLog[turn-1][4]){
-									if(debug){console.log("valid en passant")}
-									board[beginX][beginY].splice(0,2,"n","a")
-									board[endX][endY].splice(0,2,"p",(whiteTurn))
-									board[endX][beginY].splice(0,2,"n","a")
-									if(debug){console.log("move done")}
-									return(true)
-								}
+						if(board[endX][beginY].doubleMoved == true){
+							if(debug){console.log('enemy piece double moved')}
+							if(board[endX][endY].piece == "square"){
+								if(debug){console.log('destination is clear')}
+								if(debug){console.log("valid en passant")}
+								board[beginX][beginY] = new square
+								board[endX][endY] = new pawn(whiteTurn)
+								board[endX][beginY] = new square
+								if(debug){console.log("move done")}
+								return(true)
 							}
 						}
 					}
-					if(board[endX][endY][1] == (-1*whiteTurn)){//same thing as before
-						board[endX][endY].splice(0,2,"p",whiteTurn)
-						board[beginX][beginY].splice(0,2,"n","a")
-						if(debug){"attack right verified/move done"}
-						return(true)
-					}
-					else{alert("pawns can only ATTACK diagonally")}
+				}
+				if((board[endX][endY].team == (-1*whiteTurn))&&(((endX == beginX - 1)||(endX == beginX + 1))&&(endY == beginY + whiteTurn))){
+					board[endX][endY] = new pawn(whiteTurn)
+					board[beginX][beginY] = new square
+					if(debug){"attack right verified/move done"}
+					return(true)
 				}
 				else if((endY == beginY + whiteTurn)&&(endX == beginX)){//checks if you are trying to move one forward
 					if(debug){console.log("attempted move forward")}
-					if(board[endX][endY][0] == "n"){//checks that there is nothing where you are trying to move
-						board[endX][endY].splice(0,2,"p",whiteTurn)
-						board[beginX][beginY].splice(0,2,"n","a")
+					if(board[endX][endY].piece == 'square'){
+						board[endX][endY] = new pawn(whiteTurn)
+						board[beginX][beginY] = new square
 						if(debug){console.log("move verified/move done")}
 						return(true)
 					}
-					else{alert("pawns can only MOVE forward")}
+					else{if(alerts){alert("pawns can only MOVE forward")}}
 				}
-				else if((endY == beginY + (2*whiteTurn))&&(endX == beginX)){
+				if((endY == beginY + (2*whiteTurn))&&(endX == beginX)){
 					if(debug){console.log("attempting move two forward")}
-					if((board[beginX][beginY+whiteTurn][0]=="n")&&(board[beginX][beginY+(2*whiteTurn)][0]=="n")){
-						if(debug){console.log("double move first step validated")}
-						if((whiteTurn == 1)&&(beginY==1)){
-							if(debug){console.log("double move second step validated")}
-							p2move[beginX+(((-1*whiteTurn)+1)*4)] = true
-							board[beginX][beginY].splice(0,2,"n","a")
-							board[endX][endY].splice(0,2,"p",whiteTurn)
-							return(true)
+					if(board[beginX][beginY+whiteTurn].piece == "square"){
+						if(board[beginX][beginY+(2*whiteTurn)].piece == "square"){
+							if(debug){console.log("double move step 1 validated")}
+								if(((whiteTurn == 1)&&(beginY==1))||((whiteTurn == -1)&&(beginY==6))){
+								if(debug){console.log("double move step 2 validated")}
+								board[beginX][beginY] = new square
+								board[endX][endY] = new pawn(whiteTurn)
+								board[endX][endY].doubleMoved = true
+								return(true)
+							}
+							else {
+							console.log('failed double move(attempted move outside pawn start)')
+							if(alerts){alert('pawns can only double move from their starting row')}
+							}
 						}
-						else if((whiteTurn == -1)&&(beginY==6)){
-							if(debug){console.log("double move second step validated")}
-							p2move[beginX+(((-1*whiteTurn)+1)*4)] = true
-							board[beginX][beginY].splice(0,2,"n","a")
-							board[endX][endY].splice(0,2,"p",whiteTurn)
-							return(true)
+						else {
+							console.log('failed double move(attempted capture w/ move)')
+							if(alerts){alert('pawns can only move forward')}
 						}
 					}
+					else {
+						console.log('failed double move(attempted move over piece)')
+						if(alerts){alert("when double moving, you can't go over pieces")}
+					}
 				}
-				else{alert("move the pawn like a pawn")}
+				else{if(alerts){alert("move the pawn like a pawn")}}
 			}
-			else if(board[beginX][beginY][0] == "k"){//knight
+		}
+		class knight {
+			constructor(team){
+				this.team = team
+				this.piece = "knight"
+				this.frozen = 0
+				this.mortal = true
+			}
+			tick(){}
+			move(beginX,beginY,endX,endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
+				}
 				if(debug){console.log("knight selected")}
-				if((endX == beginX-2)||(endX == beginX+2)){//far left/right movement area
+				if((endX == beginX-2)||(endX == beginX+2)){
 					if(debug){console.log("far left/right movement area selected")}
-					if((endY == beginY+1) || (endY == beginY-1)){//1 up and 1 down are both valid
-						board[endX][endY].splice(0,2,"k",whiteTurn)
-						board[beginX][beginY].splice(0,2,"n","a")//actual movement
+					if((endY == beginY+1) || (endY == beginY-1)){
+						board[endX][endY] = new knight(whiteTurn)
+						board[beginX][beginY] = new square
 						if(debug){console.log("move verified/move done")}
 						return(true)
 					}
 				}
-				if((endX == beginX-1)||(endX == beginX+1)){//near left/right movement area
+				if((endX == beginX-1)||(endX == beginX+1)){
 					if(debug){console.log("near left/right movement area selected")}
-					if((endY == beginY+2)||(endY == beginY-2)){//2 up/down are valid
-						board[endX][endY].splice(0,2,"k",whiteTurn)
-						board[beginX][beginY].splice(0,2,"n","a")
+					if((endY == beginY+2)||(endY == beginY-2)){
+						board[endX][endY] = new knight(whiteTurn)
+						board[beginX][beginY] = new square
 						if(debug){console.log("move verified/move done")}
 						return(true)
 					}
 				}
-				else{alert("move the knight like a knight")}
+				else{if(alerts){alert("move the knight like a knight")}}
 			}
-			else if(board[beginX][beginY][0] == "r"){//rook
+		}
+		class rook {
+			constructor(team,moved){
+				this.team = team
+				this.piece = "rook"
+				this.frozen = 0
+				this.mortal = true
+				if(moved == null){
+					this.moved = false
+				}
+				else{this.moved = moved}
+			}
+			tick(){}
+			move(beginX,beginY,endX,endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
+				}
 				if(debug){console.log("rook selected")}
 				if(endX == beginX){//if it is moving on the x axis
 					if(debug){console.log("Y axis moving")}
 					if(endY > beginY){//if it is moving left
 						if(debug){console.log("moving forward")}
-						return(RBQ(beginX,beginY,endX,endY,0,1,"r"))
+						return(RBQ(beginX,beginY,endX,endY,0,1,rook))
 					}
 					else{
 						if(debug){console.log("moving backwards")}
-						return(RBQ(beginX,beginY,endX,endY,0,-1,"r"))
+						return(RBQ(beginX,beginY,endX,endY,0,-1,rook))
 					}
 				}
 				else if(endY == beginY){//if it is moving on the x axis
 					if(beginX < endX){//if it is moving down
 						if(debug){console.log("moving left")}
-						return(RBQ(beginX,beginY,endX,endY,1,0,"r"))
+						return(RBQ(beginX,beginY,endX,endY,1,0,rook))
 					}
 					else{
 						if(debug){console.log("moving right")}
-						return(RBQ(beginX,beginY,endX,endY,-1,0,"r"))
+						return(RBQ(beginX,beginY,endX,endY,-1,0,rook))
 					}
 				}
-				else{alert("move a rook like a rook")}
+				else{if(alerts){alert("move a rook like a rook")}}
 			}
-			else if(board[beginX][beginY][0]=="K"){//king
-				if((endX > beginX-2)&&(endX < beginX+2)){//checks if you are attempting to move to a valid x position
-					if((endY > beginY-2)&&(endY < beginY+2)){//same thing but for the y position
-						board[endX][endY].splice(0,2,"K",whiteTurn)
-						board[beginX][beginY].splice(0,2,"n","a")
-						moved[(beginY/(2+(1/3)))+1] = true
+		}
+		class king {
+			constructor(team,moved){
+				this.team = team
+				this.piece = "king"
+				this.frozen = 0
+				this.mortal = true
+				if(moved == null){
+					this.moved = false
+				}
+				else{this.moved = moved}
+			}
+			tick(){}
+			move(beginX,beginY,endX,endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
+				}
+				if((endX > beginX-2)&&(endX < beginX+2)){
+					if(debug){console.log('valid x position')}
+					if((endY > beginY-2)&&(endY < beginY+2)){
+						if(debug){console.log('valid y position')}
+						board[endX][endY] = new king(whiteTurn,true)
+						board[beginX][beginY] = new square
+						if(debug){console.log('move done')}
 						return(true)
 					}
-					else{alert("the king can ONLY move in a three by three area around it")}
-				}//yes there are two of them, but if I don't then it would be extra comlpicated
-				else{alert("the king can ONLY move in a three by three area around it")}
+					else{if(alerts){alert("the king can ONLY move in a three by three area around it")}}
+				}
+				else{if(alerts){alert("the king can ONLY move in a three by three area around it")}}
 			}
-			else if(board[beginX][beginY][0]=="b"){//bishop
+		}
+		class bishop {
+			constructor(team){
+				this.team = team
+				this.piece = "bishop"
+				this.frozen = 0
+				this.mortal = true
+			}
+			tick(){}
+			move(beginX,beginY,endX,endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
+				}
 				if(debug){console.log("bishop selected")}
 				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
 					if(debug){console.log("step 1 valid")}
@@ -348,27 +364,40 @@
 						if(debug){console.log("moving right")}
 						if(endX > beginX){
 							if(debug){console.log("moving down")}
-							return(RBQ(beginX,beginY,endX,endY,1,1,"b"))
+							return(RBQ(beginX,beginY,endX,endY,1,1,bishop))
 						}
 						else{
 							if(debug){console.log("moving up")}
-							return(RBQ(beginX,beginY,endX,endY,-1,1,"b"))
+							return(RBQ(beginX,beginY,endX,endY,-1,1,bishop))
 						}
 					}
 					else{
 						if(debug){console.log("moving left")}
 						if(endX > beginX){
 							if(debug){console.log("moving down")}
-							return(RBQ(beginX,beginY,endX,endY,1,-1,"b"))
+							return(RBQ(beginX,beginY,endX,endY,1,-1,bishop))
 						}
 						else{
 							if(debug){console.log("moving up")}
-							return(RBQ(beginX,beginY,endX,endY,-1,-1,"b"))
+							return(RBQ(beginX,beginY,endX,endY,-1,-1,bishop))
 						}
 					}
 				}
 			}
-			else if(board[beginX][beginY][0]=="Q"){//queen
+		}
+		class queen {
+			constructor(team){
+				this.team = team
+				this.piece = "queen"
+				this.frozen = 0
+				this.mortal = true
+			}
+			tick(){}
+			move(beginX,beginY,endX,endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
+				}
 				if(debug){console.log("queen selected")}
 				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
 					if(debug){console.log("step 1 valid")}
@@ -376,22 +405,22 @@
 						if(debug){console.log("moving right")}
 						if(endX > beginX){
 							if(debug){console.log("moving down")}
-							if(RBQ(beginX,beginY,endX,endY,1,1,"Q")){return(true)}
+							return(RBQ(beginX,beginY,endX,endY,1,1,queen))
 						}
 						else{
 							if(debug){console.log("moving up")}
-							if(RBQ(beginX,beginY,endX,endY,-1,1,"Q")){return(true)}
+							return(RBQ(beginX,beginY,endX,endY,-1,1,queen))
 						}
 					}
 					else{
 						if(debug){console.log("moving left")}
 						if(endX > beginX){
 							if(debug){console.log("moving down")}
-							if(RBQ(beginX,beginY,endX,endY,1,-1,"Q")){return(true)}
+							return(RBQ(beginX,beginY,endX,endY,1,-1,queen))
 						}
 						else{
 							if(debug){console.log("moving up")}
-							if(RBQ(beginX,beginY,endX,endY,-1,-1,"Q")){return(true)}
+							return(RBQ(beginX,beginY,endX,endY,-1,-1,queen))
 						}
 					}
 				}
@@ -400,39 +429,255 @@
 						if(debug){console.log("X axis movement selected")}
 						if(endY > beginY){//if it is moving left
 							if(debug){console.log("moving up")}
-							return(RBQ(beginX,beginY,endX,endY,0,1,"Q"))
+							return(RBQ(beginX,beginY,endX,endY,0,1,queen))
 						}
 							else{
 							if(debug){console.log("moving down")}
-							return(RBQ(beginX,beginY,endX,endY,0,-1,"Q"))
+							return(RBQ(beginX,beginY,endX,endY,0,-1,queen))
 						}
 					}
 					else if(endY == beginY){//if it is moving on the x axis
 						if(beginX < endX){//if it is moving down
 							if(debug){console.log("moving left")}
-							return(RBQ(beginX,beginY,endX,endY,1,0,"Q"))
+							return(RBQ(beginX,beginY,endX,endY,1,0,queen))
 						}
 					else{
 							if(debug){console.log("moving right")}
-							return(RBQ(beginX,beginY,endX,endY,-1,0,"Q"))
+							return(RBQ(beginX,beginY,endX,endY,-1,0,queen))
 						}
 					}
 				}
-				else{alert("move the queen like a queen")}
+				else{if(alerts){alert("move the queen like a queen")}}
 			}
-		return(false)
 		}
-		function draw() {
-			if(debug){console.log("starting draw")}
-			for(let i = 0; i < 8; i++){
-				temp = []
-				for(let j = 0; j < 8; j++){
-					temp.push(board[i][j][0]+board[i][j][1])
-				}
-				temp.toString()
-				console.log(temp)
+		class circus{
+			constructor(team,x,y){
+				this.team = team
+				this.piece = "circus"
+				this.x = x
+				this.y = y
+				this.frozen = 0
+				this.mortal = true
 			}
-			if(debug){console.log("draw done")}
+			tick(){}
+			move(endX,endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
+				}
+				if(debug){console.log('attempted circus move')}
+				if((Math.abs(endX-this.x)) < 2){
+					if(debug){console.log('x axis good')}
+					if((Math.abs(endY-this.y)) < 2){
+						if(debug){console.log('y axis good')}
+						if((this.x == endX)||(this.y == endY)){
+							if(debug){console.log('direction good')}
+							let out = false
+							if(board[endX][endY].team == 0){
+								out = true
+							}
+							board[endX][endY] = new circus(this.team,endX,endY)
+							board[this.x][this.y] = new square
+							return(out)
+						}
+					}
+				}
+			}
+		}
+		class wizard{
+			constructor(team,x,y){
+				this.team = team
+				this.piece = "wizard"
+				this.x = x
+				this.y = y
+				this.frozen = 0
+				this.mortal = true
+			}
+			tick(){}
+			move(endX,endY){
+				if(!(this.frozen == false)){
+					if(debug){console.log('attempted frozen move')}
+					return(false)
+				}
+				var attempt = prompt('what do you want to do? move/freeze/teleport')
+				if(attempt == 'move'){
+					if(board[endX][endY].piece == "square"){
+						if((Math.abs(endX-this.x)) < 2){
+							if(debug){console.log('x axis good')}
+							if((Math.abs(endY-this.y)) < 2){
+								if(debug){console.log('y axis good')}
+								board[endX][endY] = new wizard(this.team,endX,endY)
+								board[this.x][this.y] = new square
+								return(true)
+							}
+						}
+					}
+				}
+				else if(attempt == 'freeze'){
+					board[endX][endY].frozen = 4
+					board[this.x][this.y] = new pawn(this.team)
+					return(true)
+				}
+				else if(attempt == 'teleport'){
+					if(board[endX][endY].piece = 'square'){
+						board[this.x][this.y] = new square
+						board[endX][endY] = new pawn(this.team)
+						return(true)
+					}
+				}
+			}
+		}
+		class paladin{
+			constructor(team,x,y){
+				this.team = team
+				this.piece = "paladin"
+				this.x = x
+				this.y = y
+				this.frozen = 0
+				this.mortal = true
+			}
+			move(endX,endY){
+				if((Math.abs(endX-this.x)) < 2){
+					if(debug){console.log('x axis good')}
+					if((Math.abs(endY-this.y)) < 2){
+						if(debug){console.log('y axis good')}
+						board[endX][endY] = new paladin(this.team,endX,endY)
+						board[this.x][this.y] = new square
+						return(true)
+					}
+				}
+			}
+			tick(){
+				if(whiteTurn == this.team){
+					this.mortal = false
+				}
+			}
+		}
+		function move(beginX, beginY, endX, endY) {
+			beginX = parseInt(beginX)
+			beginY = parseInt(beginY)
+			endX = parseInt(endX)
+			endY = parseInt(endY)
+			if(debug){console.log("move", beginX, beginY, endX, endY)}
+			if(board[beginX][beginY] == null) {
+				if(alerts){alert("you can't move a non-existant piece")}
+			}
+			else if(board[beginX][beginY].team == (-1*whiteTurn)){//cheat prevention
+				if(alerts){alert("you can't move enemy pieces")}
+			}
+			else if((endX == beginX)&&(endY == beginY)){//makes sure the start and end aren't the same
+				if(alerts){alert("you have to actually move the piece")}
+			}
+			else if(board[endX][endY].mortal == false){
+				if(debug){console.log('attempted immortal kill')}
+				if(alerts){alert("can't kill the immortal")}
+			}
+			else if(board[endX][endY].team == whiteTurn){
+				if(board[beginX][beginY].piece == "rook"){
+					if(board[endX][endY].piece == "king"){
+						if(debug){console.log("attempted castle")}
+						if((beginX == 0)||(beginX == 7)){
+							if(debug){console.log("back row")}
+							if((beginY == 0)||(beginY == 7)){
+								if(board[endX][endY].moved == false){
+									if(debug){console.log("king hasn't moved")}
+									if(board[beginX][beginY].moved == false){
+										if(debug){console.log("pieces haven't moved")}			
+										var valid = true
+										if(debug){console.log("starting empty check")}
+										var count = 1
+										if(beginX == 0){
+											if(debug){console.log("left side")}
+											while((count < 4)&&(valid)){
+												if(debug){
+													console.log("checking " + count)
+												}
+												if(!(board[count][beginY].piece == "square")){valid = false}
+												if(debug){console.log(valid)}
+												count++
+											}
+										}
+										else{
+											if(debug){console.log("right side")}
+											while((count < 3)&&(valid)){
+												if(debug){
+													console.log("checking " + count)
+												}
+												if(!(board[7-count][beginY].piece == "square")){valid = false}
+												if(debug){console.log(valid)}
+												count++
+											}
+										}
+									}
+									else{
+										if(debug){console.log("pieces have moved")}
+										if(alerts){alert("invalid castle")}
+										return(false)
+									}
+								}
+								if(valid){
+									if(debug){console.log("it worked")}
+									board[beginX][endY] = new square
+									board[endX][endY] = new square
+									if(debug){console.log("pieces cleared")}
+									board[Math.abs((beginX)-1)][beginY] = new king(whiteTurn,true)
+									board[Math.abs((beginX)-2)][beginY] = new rook(whiteTurn,true)
+									return(true)
+								}
+							}
+						}
+					}
+				}
+				else{if(alerts){alert("You can't capture your own pieces")}}
+			}
+			else if(board[beginX][beginY].piece == "pawn") {
+				if(board[beginX][beginY].move(beginX,beginY,endX,endY)){
+					if(endY == ((whiteTurn+1)*3.5)){
+						var valid = ["knight", "rook", "bishop", "queen", "circus", "wizard"]
+						do {
+							if(debug){console.log("attempting input")}
+							var input = prompt("What would you like the promoted pawn to be?")
+						}
+						while(!(valid.includes(input)))
+						if(debug){console.log("input valid")}
+						if(input == "knight"){input = knight}
+						else if(input == "rook"){input = rook}
+						else if(input == "bishop"){input = bishop}
+						else if(input == "queen"){input = queen}
+						else if(input == "circus"){input = circus}
+						else if(input == "wizard"){input = wizard}
+						else{console.error("promotion input change error")}
+						board[endX][endY] = new input(whiteTurn,endX,endY)
+						if(debug){console.log("Promotion done")}
+					}
+					return(true)
+				}
+			}
+			else if(board[beginX][beginY].piece == "knight"){
+				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
+			}
+			else if(board[beginX][beginY].piece == "rook"){
+				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
+			}
+			else if(board[beginX][beginY].piece == "king"){
+				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
+			}
+			else if(board[beginX][beginY].piece == "bishop"){
+				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
+			}
+			else if(board[beginX][beginY].piece == "queen"){
+				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
+			}
+			else if(board[beginX][beginY].piece == "circus"){
+				return(board[beginX][beginY].move(endX,endY))
+			}
+			else if(board[beginX][beginY].piece == "wizard"){
+				return(board[beginX][beginY].move(endX,endY))
+			}
+			else if(board[beginX][beginY].piece == "paladin"){
+				return(board[beginX][beginY].move(endX,endY))
+			}
+			return(false)
 		}
 		function endcheck() {
 			var whiteKing = false
@@ -440,12 +685,12 @@
 			if(debug){console.log("begining check for if a king is alive")}
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
-					if(board[i][j][0] == "K") {
-						if(board[i][j][1] == 1) {
+					if(board[i][j].piece == "king") {
+						if(board[i][j].team == 1) {
 							whiteKing = true
 							if(debug){console.log("white king found")}
 						}
-						if(board[i][j][1] == -1) {
+						if(board[i][j].team == -1) {
 							blackKing = true
 							if(debug){console.log("black king found")}
 						}					
@@ -455,104 +700,24 @@
 			if(whiteKing == false){
 				if(whiteKing == blackKing){
 					console.error("both kings are dead")
-					alert("contrats! you broke my game!")
+					if(alerts){alert("contrats! you broke my game!")}
 				}
 				else{
 					if(debug){console.log("black victory")}
-					alert("black wins!")
+					if(alerts){alert("black wins!")}
 					reset(true)
 					return(false)
 				}
 			}
 			else if(blackKing == false){
 				if(debug){console.log("white victory")}
-				alert("white wins!")
+				if(alerts){alert("white wins!")}
 				reset(true)
 				return(false)
 			}
 			else {
 				return(true)
 				if(debug){console.log("both kings are alive")}
-			}
-		}
-		function promotion(){
-			if(debug){console.log("promotion check begin")}
-			var row = ((whiteTurn+1)*3.5)
-			var valid = ["knight","rook","bishop","queen"]
-			if(debug){console.log("row: " + row)}
-			for(let i = 0; i < 8; i++){
-				if(debug){console.log("checking column " + i)}
-				if(board[i][row][0] == "p"){
-					if(debug){console.log("pawn found")}
-					do {
-						if(debug){console.log("attempting input")}
-						var input = prompt("What would you like the promoted pawn to be?")
-					}
-					while(!(valid.includes(input)))
-					if(debug){console.log("input valid")}
-					if(input == "knight"){input = "k"}
-					else if(input == "rook"){input = "r"}
-					else if(input == "bishop"){input = "b"}
-					else if(input == "queen"){input = "Q"}
-					else{console.error("promotion input change error")}
-					board[i][row].splice(0,2,input,whiteTurn)
-					if(debug){console.log("Promotion done")}
-				}
-			}
-		}
-		function start() {
-			playing = true
-			reset(true)
-			quit = false
-			while(playing){
-				failed = false
-				draw()
-				if(whiteTurn == 1){alert("it is white's turn")}
-				else{alert("it is black's turn")}
-				if(debug){console.log("turn said")}
-				inputs = []
-				inputs.push(prompt("what is the x position of the piece you want to move"))
-				inputs.push(prompt("what is the y position of the piece you want to move"))
-				inputs.push(prompt("what is the x position of the place you want to move to"))
-				inputs.push(prompt("what is the y position of the place you want to move to"))
-				if(debug){console.log("data gained")}
-				i = 0
-				while((i < (inputs.length-1))&&(!(failed))){
-					if(debug){console.log("Checking input " + (i))}
-					if(debug){console.log("input is " + inputs[i])}
-					if(inputs[i] == undefined) {
-						failed = true
-						playing = false
-						if(debug){console.log("quitting game")}
-					}
-					else if(inputs[i] == ""){
-						if(debug){console.log("nothing was entered")}
-						alert("Please enter a location")
-						failed = true
-					}
-					else if(!((inputs[i] < 9)&&(inputs[i] > 0))){
-						failed = true
-						if(debug){console.log("invalid input(out of bounds)")}
-						alert("It has to be on the board")
-					}
-					i ++
-				}
-				if(debug){console.log("validity check done")}
-				if(failed == false){
-					if(debug){console.time("turn")}
-					failed = !(move(inputs[0]-1, inputs[1]-1, inputs[2]-1, inputs[3]-1))}
-					if(debug){
-						console.log(console.timeEnd("turn"))
-						console.log("movement done")
-					}
-				if(failed == false) {//the reason why it check twice is because the first one redefines false
-					promotion()
-					whiteTurn *= -1
-					if(debug){console.log("turn swapped")}
-				}
-				if(playing){
-					playing = endcheck()
-				}
 			}
 		}
 		var turn = 0
@@ -573,23 +738,8 @@
 				if(debug){console.log("loading board")}
 			}
 		}
-		function moveLogger(beginX,beginY,endX,endY){
-			temp = []
-			temp.push(beginX)
-			temp.push(beginY)
-			temp.push(endX)
-			temp.push(endY)
-			if(board[endX][endY][0] == "p"){
-				if((Math.abs(beginY-endY)) == 2){
-					temp.push(true)
-				}
-				else{temp.push(false)}
-			}
-			else{temp.push(false)}
-			moveLog.push(temp)
-		}
 		function undo(){
-			logger(turn-2)
+			logger(log.length-2)
 		}
 		function graphicStart(X,Y,x,y) {
 			if(debug){
@@ -600,7 +750,14 @@
 			failed = (!(move(X,Y,x,y)))
 			if(debug){console.log("movement done")}
 			if(!(failed)){
-				promotion()
+				for(let i = 0; i < 8; i++){
+					for(let j = 0; j < 8; j++){
+						if(board[i][j].frozen > 0){
+							board[i][j].frozen -= 1
+						}
+						board[i][j].tick()
+					}
+				}
 				whiteTurn *= -1
 				if(!(endcheck())){
 					if(debug){console.log("resetting")}
@@ -609,7 +766,6 @@
 				}
 				if(debug){console.log("continuing game")}
 				logger()
-				moveLogger(X,Y,x,y)
 			}
 			graphicDraw()
 		}
@@ -652,21 +808,14 @@
 				buttonShort.style.fontSize = size/10
 				buttonShort.innerHTML = (("" + j) + i)
 				test.appendChild(buttonShort);
-				buttonShort.addEventListener("click", function() {
-					if(debug){
-						if(debug){console.log("previous click was at " + clickPos[0] + clickPos[1])}
-						if(debug){console.log("current click is at " + (this.dataset.x) + (this.dataset.y))}
-						if(debug){console.log(firstClick)}
-					}
-					if(firstClick){
-						clickPos[0] = (this.dataset.x)
-						clickPos[1] = (this.dataset.y)
-						firstClick = false
-					}
-					else{
-						firstClick = true
-						graphicStart(clickPos[0],clickPos[1],(this.dataset.x),(this.dataset.y))
-					}
+				buttonShort.addEventListener('mousedown', function(){
+					clickPos[0] = this.dataset.x
+					clickPos[1] = this.dataset.y
+					if(debug){console.log("first click was at " + clickPos[0] + clickPos[1])}
+				})
+				buttonShort.addEventListener('mouseup', function(){
+					if(debug){console.log('second click was at ' + this.dataset.x + this.dataset.y)}
+					graphicStart(clickPos[0],clickPos[1],(this.dataset.x),(this.dataset.y))
 				})
 			}
 		}
@@ -676,42 +825,76 @@
 		//9815 White bishop
 		//9816 White knight
 		//9817 White pawn
+		//9828 White Circus
 		//9818 Black king
 		//9819 Black queen
 		//9820 Black rook
 		//9821 Black bishop
 		//9822 Black knight
 		//9823 Black pawn
-		function graphicDraw(){//-1/1-1 -2/0/2 -1/0*-1 1/0
+		//9824 Black Curcus
+		function graphicDraw(){
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
 					let item = document.getElementById((''+i)+j)
-					let team = board[i][j][1]
-					piece = 0
-					if(board[i][j][0] == "p"){
-						piece = 6
+					let team = board[i][j].team
+					let piece = board[i][j].piece
+					let normal = ["pawn","rook","knight","king","queen","bishop","square"]
+					if(((i%2)-(j%2)) == 0){
+						item.style.backgroundColor = "grey"
 					}
-					else if(board[i][j][0] == "r"){
-						piece = 3
+					else{
+						item.style.backgroundColor = "rgb(235, 235, 235)"
 					}
-					else if(board[i][j][0] == "k"){
-						piece = 5
+					item.style.color = "black"
+					if(!(board[i][j].frozen == 0)){
+						item.style.backgroundColor = 'blue'
 					}
-					else if(board[i][j][0] == "b"){
-						piece = 4
+					if(normal.includes(piece)){
+						if(piece == "pawn"){
+							piece = 6
+						}
+						else if(piece == "rook"){
+							piece = 3
+						}
+						else if(piece == "knight"){
+							piece = 5
+						}
+						else if(piece == "bishop"){
+							piece = 4
+						}
+						else if(piece == "king"){
+							piece = 1
+						}
+						else if(piece == "queen"){
+							piece = 2
+						}
+						if(piece == "square") {
+							item.innerHTML = '';
+						}
+						else {
+							unicode = ((9811+(piece))+(6*(((board[i][j].team)-1)/-2)))
+							item.innerHTML = '&#'+unicode+';';
+						}
 					}
-					else if(board[i][j][0] == "K"){
-						piece = 1
-					}
-					else if(board[i][j][0] == "Q"){
-						piece = 2
-					}
-					if(piece == 0) {
-						item.innerHTML = '';
-					}
-					else {
-						unicode = ((9811+(piece))+(6*(((board[i][j][1])-1)/-2)))
-						item.innerHTML = '&#'+unicode+';';
+					else{
+						if(piece == "circus"){
+							if(team == 1){
+								item.innerHTML = '&#9828;';
+							}
+							else{
+								item.innerHTML = '&#9824;';
+							}
+						}
+						else if(piece == "wizard"){
+							item.innerHTML = '&#10699;'
+							if(team == 1){
+								item.style.color = 'white'
+							}
+						}
+						else if(piece == "paladin"){
+							item.innerHTML = '&#167;'
+						}
 					}
 				}
 			}
@@ -733,6 +916,9 @@
 						if(change == 'checker'){
 							if(((i%2)-(j%2)) == 0){
 								item.classList.add('checker')
+							}
+							else{
+								item.classList.add('blank')
 							}
 						}
 						else if(change == 'dark-mode'){
@@ -805,6 +991,9 @@
 		}
 		.checker {
 			background-color:gray;
+		}
+		.blank {
+			background-color:rgb(235, 235, 235);
 		}
 	</style>
 </body>
