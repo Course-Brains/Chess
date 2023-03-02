@@ -139,10 +139,6 @@
 			}
 			tick(){}
 			move(beginX, beginY, endX, endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				if(debug){console.log("pawn selected")}
 				if((endX == beginX - 1)&&(endY == beginY + this.team)){
 					if(debug){console.log('attempted diagonal movement left')}
@@ -245,10 +241,6 @@
 			}
 			tick(){}
 			move(beginX,beginY,endX,endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				if(debug){console.log("knight selected")}
 				if((endX == beginX-2)||(endX == beginX+2)){
 					if(debug){console.log("far left/right movement area selected")}
@@ -284,10 +276,6 @@
 			}
 			tick(){}
 			move(beginX,beginY,endX,endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				if(debug){console.log("rook selected")}
 				if(endX == beginX){//if it is moving on the x axis
 					if(debug){console.log("Y axis moving")}
@@ -326,10 +314,6 @@
 			}
 			tick(){}
 			move(beginX,beginY,endX,endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				if((endX > beginX-2)&&(endX < beginX+2)){
 					if(debug){console.log('valid x position')}
 					if((endY > beginY-2)&&(endY < beginY+2)){
@@ -353,10 +337,6 @@
 			}
 			tick(){}
 			move(beginX,beginY,endX,endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				if(debug){console.log("bishop selected")}
 				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
 					if(debug){console.log("step 1 valid")}
@@ -394,10 +374,6 @@
 			}
 			tick(){}
 			move(beginX,beginY,endX,endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				if(debug){console.log("queen selected")}
 				if(Math.abs(endX-beginX) == Math.abs(endY-beginY)){
 					if(debug){console.log("step 1 valid")}
@@ -461,10 +437,6 @@
 			}
 			tick(){}
 			move(endX,endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				if(debug){console.log('attempted circus move')}
 				if((Math.abs(endX-this.x)) < 2){
 					if(debug){console.log('x axis good')}
@@ -495,10 +467,6 @@
 			}
 			tick(){}
 			move(endX,endY){
-				if(!(this.frozen == false)){
-					if(debug){console.log('attempted frozen move')}
-					return(false)
-				}
 				var attempt = prompt('what do you want to do? move/freeze/teleport')
 				if(attempt == 'move'){
 					if(board[endX][endY].piece == "square"){
@@ -553,13 +521,45 @@
 				}
 			}
 		}
+		class bard{
+			constructor(team,x,y){
+				this.team = team
+				this.piece = "bard"
+				this.x = x
+				this.y = y
+				this.frozen = 0
+				this.mortal = true
+			}
+			tick(){}
+			move(endX,endY){
+				if(debug){console.log('bard selected')}
+				if((Math.abs(endX-this.x)) < 2){
+					if(debug){console.log('x axis within range')}
+					if((Math.abs(endY-this.y)) < 2){
+						if(debug){console.log('y axis within range')}
+						if(board[endX][endY].piece = "square"){
+							if(debug){console.log('moving')}
+							board[endX][endY] = new bard(1,endX,endY)
+							board[this.x][this.y] = new square
+							return(true)
+						}
+						else{
+							if(debug){console.log('converting')}
+							board[endX][endY].team = this.team
+							return(true)
+						}
+					}
+				}
+			}
+		}
 		function move(beginX, beginY, endX, endY) {
 			beginX = parseInt(beginX)
 			beginY = parseInt(beginY)
 			endX = parseInt(endX)
 			endY = parseInt(endY)
+			let piece = board[beginX][beginY].piece
 			if(debug){console.log("move", beginX, beginY, endX, endY)}
-			if(board[beginX][beginY] == null) {
+			if(board[beginX][beginY].piece == "square") {
 				if(alerts){alert("you can't move a non-existant piece")}
 			}
 			else if(board[beginX][beginY].team == (-1*whiteTurn)){//cheat prevention
@@ -572,8 +572,12 @@
 				if(debug){console.log('attempted immortal kill')}
 				if(alerts){alert("can't kill the immortal")}
 			}
+			else if(board[beginX][beginY].frozen > 0){
+				if(debug){console.log('attempted frozen move')}
+				if(alerts){alert("attempted frozen move")}
+			}
 			else if(board[endX][endY].team == whiteTurn){
-				if(board[beginX][beginY].piece == "rook"){
+				if(piece == "rook"){
 					if(board[endX][endY].piece == "king"){
 						if(debug){console.log("attempted castle")}
 						if((beginX == 0)||(beginX == 7)){
@@ -630,7 +634,7 @@
 				}
 				else{if(alerts){alert("You can't capture your own pieces")}}
 			}
-			else if(board[beginX][beginY].piece == "pawn") {
+			else if(piece == "pawn") {
 				if(board[beginX][beginY].move(beginX,beginY,endX,endY)){
 					if(endY == ((whiteTurn+1)*3.5)){
 						var valid = ["knight", "rook", "bishop", "queen", "circus", "wizard"]
@@ -653,28 +657,31 @@
 					return(true)
 				}
 			}
-			else if(board[beginX][beginY].piece == "knight"){
+			else if(piece == "knight"){
 				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
 			}
-			else if(board[beginX][beginY].piece == "rook"){
+			else if(piece == "rook"){
 				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
 			}
-			else if(board[beginX][beginY].piece == "king"){
+			else if(piece == "king"){
 				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
 			}
-			else if(board[beginX][beginY].piece == "bishop"){
+			else if(piece == "bishop"){
 				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
 			}
-			else if(board[beginX][beginY].piece == "queen"){
+			else if(piece == "queen"){
 				return(board[beginX][beginY].move(beginX,beginY,endX,endY))
 			}
-			else if(board[beginX][beginY].piece == "circus"){
+			else if(piece == "circus"){
 				return(board[beginX][beginY].move(endX,endY))
 			}
-			else if(board[beginX][beginY].piece == "wizard"){
+			else if(piece == "wizard"){
 				return(board[beginX][beginY].move(endX,endY))
 			}
-			else if(board[beginX][beginY].piece == "paladin"){
+			else if(piece == "paladin"){
+				return(board[beginX][beginY].move(endX,endY))
+			}
+			else if(piece == "bard"){
 				return(board[beginX][beginY].move(endX,endY))
 			}
 			return(false)
@@ -894,6 +901,15 @@
 						}
 						else if(piece == "paladin"){
 							item.innerHTML = '&#167;'
+							if(team == 1){
+								item.style.color = 'white'
+							}
+						}
+						else if(piece == "bard"){
+							item.innerHTML = 'bard'
+							if(team == 1){
+								item.style.color = 'white'
+							}
 						}
 					}
 				}
