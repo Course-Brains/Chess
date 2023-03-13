@@ -1,9 +1,12 @@
 <head>
 	<script>
+		var uuid = 0
 		if (window.location.protocol === "file:") {
 			var debug = true
+			//var location = 'http://localhost:3000'
 		} else {
 			var debug = false
+			//var location = 'http://sh.day.org/~abe/serverside.js:3000'
 		}
 		var alerts = false
 		var board = []
@@ -22,7 +25,7 @@
 					board[X][Y] = new square
 				}
 				else{
-					board[X][Y] = new piece(team)
+					board[X][Y] = new piece(team,X,Y)
 				}
 				if(debug){console.log("piece at (" + X + "," + Y + ") changed")}
 			}
@@ -35,6 +38,23 @@
 				}
 			}
 		}
+		/*function send(X,Y,x,y,dest,other){
+			fetch(location, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				id: uuid,
+				X:X,
+				Y:Y,
+				x:x,
+				y:y,
+			}),
+			mode:'no-cors'
+		})
+			.then(response => { uuid = response.body.id})
+		}*/
 		//function created by chatGPT, modified to work with classes
 		function deepCopy3DArray(arr) {
 			return arr.map(function(layer) {
@@ -816,13 +836,21 @@
 				buttonShort.innerHTML = (("" + j) + i)
 				test.appendChild(buttonShort);
 				buttonShort.addEventListener('mousedown', function(){
+					let y = this.dataset.y+""
+					if(whiteTurn == -1){
+						y = (y*-1)+7
+					}
 					clickPos[0] = this.dataset.x
-					clickPos[1] = this.dataset.y
+					clickPos[1] = y
 					if(debug){console.log("first click was at " + clickPos[0] + clickPos[1])}
 				})
 				buttonShort.addEventListener('mouseup', function(){
-					if(debug){console.log('second click was at ' + this.dataset.x + this.dataset.y)}
-					graphicStart(clickPos[0],clickPos[1],(this.dataset.x),(this.dataset.y))
+					let y = this.dataset.y+""
+					if(whiteTurn == -1){
+						y = (y*-1)+7
+					}
+					if(debug){console.log('second click was at ' + this.dataset.x + y)}
+					graphicStart(clickPos[0],clickPos[1],(this.dataset.x),(y))
 				})
 			}
 		}
@@ -843,7 +871,12 @@
 		function graphicDraw(){
 			for(let i = 0; i < 8; i++){
 				for(let j = 0; j < 8; j++){
+					let temp = j+1
+					if(whiteTurn == -1){
+						j = (j*-1)+7
+					}
 					let item = document.getElementById((''+i)+j)
+					j = temp-1
 					let team = board[i][j].team
 					let piece = board[i][j].piece
 					let normal = ["pawn","rook","knight","king","queen","bishop","square"]
@@ -1012,4 +1045,17 @@
 			background-color:rgb(235, 235, 235);
 		}
 	</style>
+	<script>
+		/*fetch(location, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				id:'want'
+			}),
+			mode:'no-cors'
+		})
+			.then(response => { uuid = response.body.id})*/
+	</script>
 </body>
