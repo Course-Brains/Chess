@@ -149,12 +149,13 @@
 				let team = board[beginX][beginY].team
 				whiteTurn = (-1*team)
 				let castle = false
-				if(board[endX][endY].team == board[beginX][beginY.team]){
+				if(board[endX][endY].team == board[beginX][beginY].team){
 					if(debug){console.log('start and end are same team')}
 					if((board[beginX][beginY].piece == "rook")&&(board[endX][endY].piece == 'king')){
 						if(debug){console.log('attempted rook-king castle')}
-						board[Math.abs(beginX-1)][beginY] = new king(Math.abs(beginX-1,beginY))
-						board[Math.abs(beginX-2)][beginY] = new rook(Math.abs(beginX-2,beginY))
+						board[Math.abs(beginX-1)][beginY] = new king((board[beginX][beginY].team),Math.abs(beginX-1,beginY))
+						board[Math.abs(beginX-2)][beginY] = new rook((board[beginX][beginY].team),Math.abs(beginX-2,beginY))
+						board[4][beginY] = new square(4,beginX)
 						castle = true
 					}
 				}
@@ -173,7 +174,7 @@
 				for(let i = 0; i < (removal[pos].length); i++){
 					if(debug){console.log('number of items to be removed: ' + (removal[pos].length))}
 					if(debug){console.log('checking removal list item: ' + i)}
-					if(!(safeGet(removal[pos][i][0],removal[pos][i][1],true) == false)){
+					if(!(safeGet(removal[pos][i][0],removal[pos][i][1]) == false)){
 						if(debug){console.log('removing at (' + removal[pos][i][0] + removal[pos][i][1] + ')')}
 						board[removal[pos][i][0]][removal[pos][i][1]] = new square(removal[pos][i][0],removal[pos][i][1])
 					}
@@ -216,7 +217,6 @@
 			if(debug){console.log("empty rows complete")}
 			whiteTurn = 1
 			if(debug){console.log("turn reset")}
-			if(debug){console.log("castle prereq reset")}
 		}
 		function Continue(beginX,beginY,x,y){
 			let count = 1
@@ -437,7 +437,7 @@
 							if(!(failed)){
 								if(debug){console.log('path is clear')}
 								moves.push([4,this.y])
-								removal.push([[this.x,this.y][4,this.y]])
+								removal.push([[this.x,this.y]])
 							}
 						}
 					}
