@@ -47,10 +47,9 @@
 		}
 		function promotion(){
 			if(debug){console.log('starting promotion')}
-			for(let i = 0; i < 8; i += 7){
-				for(let j = 0; j < 9; j++){
-					if(debug){console.log("" + i + j)}
-					if(safeGet(i,j).piece == "pawn"){
+			for(let j = 0; j < 8; j += 7){
+				for(let i = 0; i < 8; i++){
+					if(safeGet(i,j).piece == "pawn"){//we don't need to check teams because pawns can't go backwards
 						if(debug){console.log('piece is pawn')}
 						var valid = ["knight", "rook", "bishop", "queen"]
 						do {
@@ -64,13 +63,11 @@
 						else if(input == "bishop"){input = bishop}
 						else if(input == "queen"){input = queen}
 						else{console.error("promotion input change error")}
-						board[i][j] = new input(whiteTurn,i,j)
+						board[i][j] = new input(board[i][j].team,i,j)
 						if(debug){console.log("Promotion done")}
 					}
-					return(true)
 				}
 			}
-			return(false)
 		}
 		function safeGet(x,y,bug){
 			if(bug == null){
@@ -130,11 +127,6 @@
 				}
 			}
 			if(failed == false){
-				for(let i = 0; i < 9; i++){
-					for(let j = 0; j < 9; j++){
-						//safeGet(i,j).tick()
-					}
-				}
 				if(debug){console.log('successful move')}
 				let piece = board[beginX][beginY].piece
 				if(piece == "pawn"){piece = pawn}
@@ -148,7 +140,6 @@
 				}
 				let team = board[beginX][beginY].team
 				whiteTurn = (-1*team)
-				let castle = false
 				if(board[endX][endY].team == board[beginX][beginY].team){
 					if(debug){console.log('start and end are same team')}
 					if((board[beginX][beginY].piece == "rook")&&(board[endX][endY].piece == 'king')){
@@ -156,12 +147,10 @@
 						board[Math.abs(beginX-1)][beginY] = new king((board[beginX][beginY].team),Math.abs(beginX-1,beginY))
 						board[Math.abs(beginX-2)][beginY] = new rook((board[beginX][beginY].team),Math.abs(beginX-2,beginY))
 						board[4][beginY] = new square(4,beginX)
-						castle = true
+						return(true)
 					}
 				}
-				if(!(castle)){
-					board[endX][endY] = new piece(team,endX,endY)
-				}
+				board[endX][endY] = new piece(team,endX,endY)
 				if(board[beginX][beginY].piece == "pawn"){
 					if(debug){console.log('pawn moved')}
 					if(Math.abs(endY-beginY) == 2){
@@ -182,9 +171,9 @@
 						console.error('invalid attempted removal')
 					}
 				}
+				return(true)
 			}
-			moves = []
-			removal = []
+			return(false)
 		}
 		function reset(logReset) {
 			if(logReset){
@@ -319,8 +308,8 @@
 						if(board[beginX+i][beginY].team == (-1*this.team)){
 							if(debug){console.log('space to the side has enemy')}
 							if(board[beginX+i][beginY].piece == 'pawn'){
-								if(console.log('enemy is pawn'))
-								if(board[beginX+i][beginY].doubleMoved == true){
+								if(debug){console.log('enemy is pawn')}
+								if(board[beginX+i][beginY].doubleMoved){
 									if(debug){console.log('pawn has double moved')}
 									if(board[beginX+i][beginY+this.team].piece == "square"){
 										if(debug){console.log('landing space clear/en passant valid')}
@@ -636,11 +625,25 @@
 					let x = parseInt(this.dataset.x)
 					y = parseInt(y)
 					if(debug){console.log('second click was at ' + this.dataset.x + y)}
-					move(clickPos[0],clickPos[1],(x),(y))
+					if(move(clickPos[0],clickPos[1],(x),(y))){
+						if(debug){console.log('begining ticks')}
+						for(let i = 0; i < 8; i++){						
+							for(let j = 0; j < 8; j++){
+								board[i][j].tick()	
+							}
+						}					
+					}
 					graphicDraw()
-					if(promotion()){
+					if(endcheck()){
+						promotion()
 						graphicDraw()
 					}
+					else{
+						reset()
+						graphicDraw()
+					}
+					moves = []
+					removal = []
 				})
 			}
 		}
