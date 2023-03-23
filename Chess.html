@@ -444,16 +444,17 @@
 				}
 				else{this.moved = moved}
 				this.x = x
+				this.y = y
 			}
 			tick(){}
-			check(endX,endY){
-				for(let i = -1; i < 2; i += 2){
-					for(let j = -1; j < 2; j += 2){
-						if(debug){console.log('begining check at offset (' + i + j + ')')}
-						if(!(safeGet((this.x+i),(this.y+j)) == false)){
-							if(debug){console.log('location exists')}
-							if(!(safeGet((this.x+i),(this.y+j)).team == this.team)){
-								if(debug){console.log('location does not contain friendly piece/verified')}
+			check(){
+				for(let i = -1; i < 2; i++){
+					for(let j = -1; j < 2; j++){
+						if(debug){console.log('checking position at (' + (this.x+i) + (this.y+j)) + ')'}
+						if(!(safeGet(this.x+i,this.y+j) == false)){
+							if(debug){console.log('position exists')}
+							if(!(board[this.x+i][this.y+j].team == this.team)){
+								if(debug){console.log('position does not contain friendly')}
 								moves.push([this.x+i,this.y+j])
 								removal.push([[this.x,this.y]])
 							}
