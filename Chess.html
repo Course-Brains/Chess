@@ -151,6 +151,7 @@
 					}
 				}
 				board[endX][endY] = new piece(team,endX,endY)
+				if(debug){console.log('piece made')}
 				if(board[beginX][beginY].piece == "pawn"){
 					if(debug){console.log('pawn moved')}
 					if(Math.abs(endY-beginY) == 2){
@@ -271,6 +272,7 @@
 				this.mortal = true
 				this.x = x
 				this.y = y
+				this.code = [true,true]
 			}
 			tick(){}
 			check(){}
@@ -283,6 +285,7 @@
 				this.mortal = true
 				this.x = x
 				this.y = y
+				this.code = [9817,9823]
 				if(doubleMoved == null){
 					this.doubleMoved = false
 				}
@@ -291,10 +294,13 @@
 				}
 			}
 			tick(){
-				if(!(whiteTurn == this.turn)){
+				if(whiteTurn == this.turn){
 					if(this.doubleMoved){
 						this.doubleMoved = false
 					}
+				}
+				if(this.frozen > 0){
+					this.frozen -= 1
 				}
 			}
 			check(){
@@ -360,8 +366,13 @@
 				this.mortal = true
 				this.x = x
 				this.y = y
+				this.code = [9816,9822]
 			}
-			tick(){}
+			tick(){
+				if(this.frozen > 0){
+					this.frozen -= 1
+				}
+			}
 			subCheck(x,y){
 				if(!(safeGet((this.x+x),(this.y+y)) == false)){
 					if(debug){console.log('checking at (' + (this.x+x) + (this.y+y)) + ')'}
@@ -395,8 +406,13 @@
 				else{this.moved = moved}
 				this.x = x
 				this.y = y
+				this.code = [9814,9820]
 			}
-			tick(){}
+			tick(){
+				if(this.frozen > 0){
+					this.frozen -= 1
+				}
+			}
 			check(){
 				RBQ(this.x,this.y,true,false)
 				if(!(moves == [])){
@@ -445,8 +461,13 @@
 				else{this.moved = moved}
 				this.x = x
 				this.y = y
+				this.code = [9812,9818]
 			}
-			tick(){}
+			tick(){
+				if(this.frozen > 0){
+					this.frozen -= 1
+				}
+			}
 			check(){
 				for(let i = -1; i < 2; i++){
 					for(let j = -1; j < 2; j++){
@@ -471,6 +492,7 @@
 				this.mortal = true
 				this.x = x
 				this.y = y
+				this.code = [9815,9821]
 			}
 			check(){
 				RBQ(this.x,this.y,false,true)
@@ -478,7 +500,11 @@
 					removal.push([[this.x,this.y]])
 				}
 			}
-			tick(){}
+			tick(){
+				if(this.frozen > 0){
+					this.frozen -= 1
+				}
+			}
 		}
 		class queen {
 			constructor(team,x,y){
@@ -488,6 +514,7 @@
 				this.mortal = true
 				this.x = x
 				this.y = y
+				this.code = [9813,9819]
 			}
 			check(){
 				RBQ(this.x,this.y,true,true)
@@ -495,13 +522,22 @@
 					removal.push([[this.x,this.y]])
 				}
 			}
-			tick(){}
+			tick(){
+				if(this.frozen > 0){
+					this.frozen -= 1
+				}
+			}
 		}
 		function check(beginX,beginY){
 			moves = []
 			if(!(safeGet(beginX,beginY) == false)){
-				if(safeGet(beginX,beginY).team == whiteTurn){
-					board[beginX][beginY].check()
+				if(debug){console.log('starting position exits')}
+				if(board[beginX][beginY].team == whiteTurn){
+					if(debug){console.log('starting piece is on correct team')}
+					if(board[beginX][beginY].frozen < 1){
+						if(debug){console.log("piece isn't frozen")}
+						board[beginX][beginY].check()
+					}
 				}
 			}
 		}
@@ -632,19 +668,19 @@
 							for(let j = 0; j < 8; j++){
 								board[i][j].tick()	
 							}
-						}					
-					}
-					graphicDraw()
-					if(endcheck()){
-						promotion()
+						}
 						graphicDraw()
+						if(endcheck()){
+							promotion()
+							graphicDraw()
+						}
+						else{
+							reset()
+							graphicDraw()
+						}
+						moves = []
+						removal = []
 					}
-					else{
-						reset()
-						graphicDraw()
-					}
-					moves = []
-					removal = []
 				})
 			}
 		}
@@ -683,30 +719,12 @@
 					if(!(board[i][j].frozen == 0)){
 						item.style.backgroundColor = 'blue'
 					}
-					if(piece == "pawn"){
-						piece = 6
+					piece = board[i][j].code
+					if(!(team == 0)){
+						item.innerHTML = "&#" + board[i][j].code[(team-1)/-2] + ";"
 					}
-					else if(piece == "rook"){
-						piece = 3
-					}
-					else if(piece == "knight"){
-						piece = 5
-					}
-					else if(piece == "bishop"){
-						piece = 4
-					}
-					else if(piece == "king"){
-						piece = 1
-					}
-					else if(piece == "queen"){
-						piece = 2
-					}
-					if(piece == "square") {
-						item.innerHTML = '';
-					}
-					else {
-						unicode = ((9811+(piece))+(6*(((board[i][j].team)-1)/-2)))
-						item.innerHTML = '&#'+unicode+';';
+					else{
+						item.innerHTML = ""
 					}
 				}
 			}
