@@ -144,34 +144,38 @@
 					if(debug){console.log('start and end are same team')}
 					if((board[beginX][beginY].piece == "rook")&&(board[endX][endY].piece == 'king')){
 						if(debug){console.log('attempted rook-king castle')}
-						board[Math.abs(beginX-1)][beginY] = new king((board[beginX][beginY].team),Math.abs(beginX-1,beginY))
-						board[Math.abs(beginX-2)][beginY] = new rook((board[beginX][beginY].team),Math.abs(beginX-2,beginY))
+						board[Math.abs(beginX-1)][beginY] = new king((board[beginX][beginY].team),Math.abs(beginX-1),beginY)
+						board[Math.abs(beginX-2)][beginY] = new rook((board[beginX][beginY].team),Math.abs(beginX-2),beginY)
 						board[4][beginY] = new square(4,beginX)
+						board[beginX][beginY] = new square(beginX,beginY)
 						return(true)
 					}
 				}
-				board[endX][endY] = new piece(team,endX,endY)
 				if(debug){console.log('piece made')}
+				let regMove = true
 				if(board[beginX][beginY].piece == "pawn"){
 					if(debug){console.log('pawn moved')}
 					if(Math.abs(endY-beginY) == 2){
 						if(debug){console.log('pawn double moved')}
+						board[endX][endY] = new pawn(team,endX,endY)
 						board[endX][endY].doubleMoved = true
+						regMove = false
 					}
+					else if(Math.abs(endY-beginY) == Math.abs(endX-beginX)){
+						if(debug){console.log('pawn diagonal move')}
+						if(board[endX][endY].piece == "square"){
+							if(debug){console.log('pawn did en passant')}
+							board[beginX][beginY] = new square(beginX,beginY)
+							board[endX][beginY] = new square(endX,beginY)
+							return(true)
+						}
+					}
+				}
+				if(regMove){
+					board[endX][endY] = new piece(team,endX,endY)
 				}
 				if(debug){console.log('starting removal')}
-				if(debug){console.log('removing for move item (' + pos + ')')}
-				for(let i = 0; i < (removal[pos].length); i++){
-					if(debug){console.log('number of items to be removed: ' + (removal[pos].length))}
-					if(debug){console.log('checking removal list item: ' + i)}
-					if(!(safeGet(removal[pos][i][0],removal[pos][i][1]) == false)){
-						if(debug){console.log('removing at (' + removal[pos][i][0] + removal[pos][i][1] + ')')}
-						board[removal[pos][i][0]][removal[pos][i][1]] = new square(removal[pos][i][0],removal[pos][i][1])
-					}
-					else{
-						console.error('invalid attempted removal')
-					}
-				}
+				board[beginX][beginY] = new square(beginX,beginY)
 				return(true)
 			}
 			return(false)
@@ -222,12 +226,10 @@
 					if(safeGet(posx,posy).piece == 'square'){
 						if(debug){console.log('position is empty, adding, continuing')}
 						moves.push([posx,posy])
-						removal.push([[beginX,beginY]])
 					}
 					else if(safeGet(posx,posy).team == (-1*team)){
 						if(debug){console.log('position is enemy piece, adding')}
 						moves.push([posx,posy])
-						removal.push([[beginX,beginY]])
 						end = true
 					}
 					else if(safeGet(posx,posy).team == team){
@@ -320,7 +322,6 @@
 									if(board[beginX+i][beginY+this.team].piece == "square"){
 										if(debug){console.log('landing space clear/en passant valid')}
 										moves.push([beginX+i,beginY+this.team])
-										removal.push([[beginX,beginY],[beginX+i,beginY]])
 									}
 								}
 							}
@@ -328,7 +329,6 @@
 						if(safeGet(beginX+i,beginY+this.team).team == (this.team * -1)){
 							if(debug){console.log('valid team/move')}
 							moves.push([beginX+i,beginY+this.team])
-							removal.push([[beginX,beginY]])
 						}
 					}
 				}
@@ -338,7 +338,6 @@
 					if(safeGet(beginX,beginY+this.team).piece == 'square'){
 						if(debug){console.log('valid team/move')}
 						moves.push([beginX,beginY+this.team])
-						removal.push([[beginX,beginY]])
 					}
 				}
 				if(debug){console.log('checking forward 2 space')}
@@ -351,7 +350,6 @@
 							if(safeGet(beginX,beginY+(2*this.team)).piece == 'square'){
 								if(debug){console.log('second square empty/move valid')}
 								moves.push([beginX,beginY+(2*this.team)])
-								removal.push([[beginX,beginY]])
 							}
 						}
 					}
@@ -378,7 +376,6 @@
 					if(debug){console.log('checking at (' + (this.x+x) + (this.y+y)) + ')'}
 					if(!(board[this.x+x][this.y+y].team == this.team)){
 						moves.push([this.x+x,this.y+y])
-						removal.push([[this.x,this.y]])
 						if(debug){console.log('valid position at (' + (this.x+x) + (this.y+y) + ')')}
 					}
 				}
@@ -416,7 +413,6 @@
 			check(){
 				RBQ(this.x,this.y,true,false)
 				if(!(moves == [])){
-					removal.push([[this.x,this.y]])
 				}
 				if(debug){console.log('begining castle check')}
 				if(this.moved == false){
@@ -442,7 +438,6 @@
 							if(!(failed)){
 								if(debug){console.log('path is clear')}
 								moves.push([4,this.y])
-								removal.push([[this.x,this.y]])
 							}
 						}
 					}
@@ -477,7 +472,6 @@
 							if(!(board[this.x+i][this.y+j].team == this.team)){
 								if(debug){console.log('position does not contain friendly')}
 								moves.push([this.x+i,this.y+j])
-								removal.push([[this.x,this.y]])
 							}
 						}
 					}
@@ -497,7 +491,6 @@
 			check(){
 				RBQ(this.x,this.y,false,true)
 				if(!(moves == [])){
-					removal.push([[this.x,this.y]])
 				}
 			}
 			tick(){
@@ -519,7 +512,6 @@
 			check(){
 				RBQ(this.x,this.y,true,true)
 				if(!(moves == [])){
-					removal.push([[this.x,this.y]])
 				}
 			}
 			tick(){
