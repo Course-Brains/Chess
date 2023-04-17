@@ -1,0 +1,50 @@
+<head>
+	<style>
+		* button {
+			background-color:lightgrey;
+			transition:background-color 0.5s;
+		}
+		* button:hover {
+			background-color:lime;
+		}
+	</style>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			var button = document.createElement('button')
+			button.setAttribute('id', 'buttonCreate')
+			button.style.width = '100'
+			button.style.height = '100'
+			button.innerHTML = "multiplayer"
+			button.addEventListener('click', () => {
+				window.location.pathname = '/chess/1'
+			})
+			document.body.appendChild(button)
+			//button to create multiplayer game^^^
+
+			button = document.createElement('button')
+			button.setAttribute('id', 'buttonSolo')
+			button.style.width = '100'
+			button.style.height = '100'
+			button.innerHTML = "solo"
+			button.addEventListener('click', () => {
+				window.location.pathname = '/solo'
+			})
+			document.body.appendChild(button)
+			//button to play against yourself^^^
+
+			button = document.createElement('button')
+			button.setAttribute('id', 'buttonJoin')
+			button.style.width = '100'
+			button.style.height = '100'
+			button.innerHTML = 'join'
+			button.addEventListener('click', () =>{
+				window.location.pathname = '/chess/2'
+			})
+			document.body.appendChild(button)
+			//button to join game
+		})
+	</script>
+</head>
+<body>
+
+</body>
